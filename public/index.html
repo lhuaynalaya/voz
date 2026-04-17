@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voto TV — Resultados en Vivo</title>
+    <meta name="description" content="Resultados electorales Peru 2026 en tiempo real. Quien pasa a segunda vuelta?">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #f4f5f7;
+            --white: #ffffff;
+            --text: #1d1d2b;
+            --text2: #6b7088;
+            --text3: #a0a4b8;
+            --border: #e4e6ee;
+            --red: #e8364e;
+            --red-light: #fef0f2;
+            --blue: #4361ee;
+            --blue-light: #eef1fe;
+            --orange: #ff8c21;
+            --green: #22c55e;
+            --shadow: 0 1px 3px rgba(0,0,0,.04), 0 4px 12px rgba(0,0,0,.03);
+            --shadow-lg: 0 2px 8px rgba(0,0,0,.05), 0 8px 24px rgba(0,0,0,.06);
+            --radius: 14px;
+        }
+
+        * { margin:0; padding:0; box-sizing:border-box }
+
+        body {
+            font-family: 'DM Sans', system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 0 16px 60px;
+        }
+
+        /* Status bar */
+        .status-bar {
+            position: fixed; top: 0; left: 0; right: 0;
+            padding: 6px; text-align: center;
+            font-size: 11px; font-weight: 600;
+            z-index: 100; transition: all .4s;
+        }
+        .status-bar.ok { background: #ecfdf5; color: #16a34a; transform: translateY(-100%); }
+        .status-bar.loading { background: #fffbeb; color: #d97706; transform: translateY(0); }
+        .status-bar.error { background: #fef2f2; color: #dc2626; transform: translateY(0); }
+
+        /* Header */
+        .header {
+            max-width: 540px; margin: 0 auto;
+            padding: 32px 0 24px;
+            display: flex; flex-direction: column; align-items: center;
+        }
+        .logo {
+            font-family: 'Outfit', sans-serif;
+            font-size: clamp(32px, 8vw, 44px);
+            font-weight: 900;
+            letter-spacing: -1px;
+            margin-bottom: 2px;
+        }
+        .logo .voto { color: var(--text); }
+        .logo .tv {
+            background: linear-gradient(135deg, var(--red), var(--orange));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .live-pill {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: var(--red); color: #fff;
+            font-size: 10px; font-weight: 700;
+            padding: 4px 12px; border-radius: 20px;
+            text-transform: uppercase; letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+        .live-pill .dot {
+            width: 6px; height: 6px;
+            background: #fff; border-radius: 50%;
+            animation: blink 1.4s infinite;
+        }
+        @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+        .tagline { font-size: 14px; color: var(--text2); }
+
+        .container { max-width: 540px; margin: 0 auto; }
+
+        /* Card base */
+        .card {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 14px;
+            overflow: hidden;
+        }
+
+        /* Actas */
+        .actas { padding: 20px 24px; text-align: center; }
+        .actas-label { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: 1.5px; font-weight: 600; }
+        .actas-pct {
+            font-family: 'Outfit', sans-serif;
+            font-size: clamp(44px, 11vw, 62px);
+            font-weight: 900;
+            color: var(--text);
+            line-height: 1.1;
+        }
+        .actas-progress {
+            width: 100%; height: 6px;
+            background: var(--bg);
+            border-radius: 3px;
+            margin: 10px 0 6px;
+            overflow: hidden;
+        }
+        .actas-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--red), var(--orange));
+            border-radius: 3px;
+            transition: width 1.5s ease;
+        }
+        .actas-sub { font-size: 12px; color: var(--text3); }
+
+        /* Candidates */
+        .versus { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+        .cand-card {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 20px 14px 18px;
+            text-align: center;
+            transition: all .3s;
+        }
+        .cand-card.lead-s { border-color: var(--red); box-shadow: var(--shadow-lg), 0 0 0 1px var(--red); }
+        .cand-card.lead-l { border-color: var(--blue); box-shadow: var(--shadow-lg), 0 0 0 1px var(--blue); }
+
+        .cand-badge {
+            display: inline-block;
+            font-size: 9px; font-weight: 700;
+            padding: 3px 10px; border-radius: 20px;
+            text-transform: uppercase; letter-spacing: .5px;
+            margin-bottom: 14px;
+        }
+        .cand-card.lead-s .cand-badge { background: var(--red); color: #fff; }
+        .cand-card.lead-l .cand-badge { background: var(--blue); color: #fff; }
+        .cand-card:not(.lead-s):not(.lead-l) .cand-badge { background: var(--bg); color: var(--text3); }
+
+        .cand-avatar {
+            width: clamp(60px, 16vw, 80px);
+            height: clamp(60px, 16vw, 80px);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'Outfit', sans-serif;
+            font-size: clamp(20px, 5vw, 28px);
+            font-weight: 800; color: #fff;
+            margin: 0 auto 12px;
+        }
+        .cand-s .cand-avatar { background: linear-gradient(140deg, #ff6b6b, var(--red)); }
+        .cand-l .cand-avatar { background: linear-gradient(140deg, #748ffc, var(--blue)); }
+        .cand-card.lead-s .cand-avatar, .cand-card.lead-l .cand-avatar { animation: float 2.5s ease-in-out infinite; }
+        @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-4px)} }
+
+        .cand-name { font-family: 'Outfit', sans-serif; font-size: clamp(16px, 4.2vw, 20px); font-weight: 700; line-height: 1.2; margin-bottom: 2px; }
+        .cand-party { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: .5px; font-weight: 600; margin-bottom: 16px; }
+        .cand-votes {
+            font-family: 'Outfit', sans-serif;
+            font-size: clamp(22px, 6vw, 32px);
+            font-weight: 800;
+            margin-bottom: 2px;
+        }
+        .cand-card.lead-s .cand-votes { color: var(--red); }
+        .cand-card.lead-l .cand-votes { color: var(--blue); }
+        .cand-pct { font-size: clamp(14px, 3.5vw, 17px); color: var(--text2); font-weight: 600; }
+
+        /* Bar */
+        .bar-section { padding: 16px 20px; }
+        .bar-labels {
+            display: flex; justify-content: space-between;
+            font-size: 11px; font-weight: 700;
+            margin-bottom: 8px; text-transform: uppercase; letter-spacing: .5px;
+        }
+        .bar-labels .s { color: var(--red); }
+        .bar-labels .l { color: var(--blue); }
+        .bar-track {
+            width: 100%; height: clamp(36px, 8vw, 46px);
+            background: var(--bg);
+            border-radius: 10px;
+            overflow: hidden; display: flex; gap: 2px;
+        }
+        .bar-fill-s {
+            background: linear-gradient(90deg, var(--red), #ff6b6b);
+            height: 100%;
+            display: flex; align-items: center; justify-content: center;
+            color: #fff; font-weight: 700;
+            font-size: clamp(11px, 2.5vw, 14px);
+            transition: width 1.5s ease;
+            border-radius: 10px 0 0 10px;
+        }
+        .bar-fill-l {
+            background: linear-gradient(90deg, #748ffc, var(--blue));
+            height: 100%;
+            display: flex; align-items: center; justify-content: center;
+            color: #fff; font-weight: 700;
+            font-size: clamp(11px, 2.5vw, 14px);
+            transition: width 1.5s ease;
+            border-radius: 0 10px 10px 0;
+        }
+
+        /* Diff */
+        .diff-section { padding: 22px 20px; text-align: center; }
+        .diff-num {
+            font-family: 'Outfit', sans-serif;
+            font-size: clamp(38px, 10vw, 58px);
+            font-weight: 900;
+            color: var(--orange);
+            line-height: 1;
+        }
+        .diff-label { font-size: 12px; color: var(--text3); margin-top: 4px; }
+
+        /* Info */
+        .info { padding: 14px 18px; font-size: 13px; color: var(--text2); text-align: center; line-height: 1.5; }
+        .info strong { color: var(--orange); }
+
+        /* Ticker */
+        .ticker {
+            padding: 10px 0; overflow: hidden;
+            border-top: 1px solid var(--border);
+        }
+        .ticker-scroll {
+            display: inline-flex; gap: 80px;
+            white-space: nowrap;
+            animation: marquee 22s linear infinite;
+        }
+        .ticker-scroll span { font-size: 13px; color: var(--text2); font-weight: 500; }
+        .ticker-scroll strong { color: var(--red); }
+        @keyframes marquee { 0%{transform:translateX(100%)} 100%{transform:translateX(-100%)} }
+
+        /* History */
+        .history-header {
+            padding: 14px 18px 0;
+            font-size: 11px; color: var(--text3);
+            text-transform: uppercase; letter-spacing: 1.5px; font-weight: 600;
+        }
+        .history-list {
+            list-style: none; padding: 8px 12px 12px;
+            max-height: 200px; overflow-y: auto;
+        }
+        .history-list::-webkit-scrollbar { width: 3px; }
+        .history-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+        .history-list li {
+            padding: 7px 8px;
+            font-size: 12px; color: var(--text2);
+            border-bottom: 1px solid var(--bg);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .history-list li:last-child { border-bottom: none; }
+        .history-list .time { color: var(--text3); font-size: 10px; }
+        .history-list .change-up { color: var(--green); font-weight: 600; }
+        .history-list .change-down { color: var(--red); font-weight: 600; }
+
+        /* Footer */
+        .foot {
+            text-align: center; padding: 16px 0;
+            font-size: 11px; color: var(--text3);
+        }
+        .foot a { color: var(--text2); text-decoration: none; }
+        .foot-countdown { font-size: 10px; color: var(--text3); margin-top: 4px; }
+    </style>
+</head>
+<body>
+
+    <div class="status-bar loading" id="statusBar">Cargando datos...</div>
+
+    <div class="header">
+        <div class="live-pill"><span class="dot"></span> En vivo</div>
+        <div class="logo"><span class="voto">Voto</span><span class="tv">TV</span></div>
+        <div class="tagline">Peru 2026 &middot; La pelea por el 2do lugar</div>
+    </div>
+
+    <div class="container">
+
+        <div class="card">
+            <div class="actas">
+                <div class="actas-label">Actas contabilizadas</div>
+                <div class="actas-pct" id="actasPct">&mdash;</div>
+                <div class="actas-progress"><div class="actas-progress-fill" id="actasBarFill" style="width:0%"></div></div>
+                <div class="actas-sub" id="actasDetail"></div>
+            </div>
+        </div>
+
+        <div class="versus">
+            <div class="cand-card cand-s lead-s" id="playerS">
+                <span class="cand-badge">2do lugar</span>
+                <div class="cand-avatar">RS</div>
+                <div class="cand-name">Roberto<br>Sanchez</div>
+                <div class="cand-party">Juntos por el Peru</div>
+                <div class="cand-votes" id="votosSanchez">&mdash;</div>
+                <div class="cand-pct" id="pctSanchez">&mdash;</div>
+            </div>
+            <div class="cand-card cand-l" id="playerL">
+                <span class="cand-badge">3er lugar</span>
+                <div class="cand-avatar">RLA</div>
+                <div class="cand-name">Rafael<br>Lopez Aliaga</div>
+                <div class="cand-party">Renovacion Popular</div>
+                <div class="cand-votes" id="votosLopez">&mdash;</div>
+                <div class="cand-pct" id="pctLopez">&mdash;</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="bar-section">
+                <div class="bar-labels">
+                    <span class="s">Sanchez</span>
+                    <span class="l">Lopez Aliaga</span>
+                </div>
+                <div class="bar-track">
+                    <div class="bar-fill-s" id="barS"></div>
+                    <div class="bar-fill-l" id="barL"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="diff-section">
+                <div class="diff-num" id="diffVotos">&mdash;</div>
+                <div class="diff-label" id="diffLabel">votos de diferencia</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="info" id="contextBox">Cargando datos de ONPE...</div>
+        </div>
+        <div class="card">
+            <div class="info" id="pendingInfo"></div>
+        </div>
+
+        <div class="card">
+            <div class="ticker">
+                <div class="ticker-scroll">
+                    <span>Segunda vuelta: <strong>8 de junio de 2026</strong> &mdash; Keiko Fujimori asegurada en 1er lugar</span>
+                    <span>Segunda vuelta: <strong>8 de junio de 2026</strong> &mdash; Keiko Fujimori asegurada en 1er lugar</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="history-header">Historial de cambios</div>
+            <ul class="history-list" id="historyList">
+                <li style="color:var(--text3);justify-content:center">Esperando datos...</li>
+            </ul>
+        </div>
+
+        <div class="foot">
+            <div id="timestamp">Esperando datos...</div>
+            <div class="foot-countdown" id="nextUpdate"></div>
+            <div style="margin-top:8px">
+                Fuente: <a href="https://resultadoelectoral.onpe.gob.pe/main/presidenciales" target="_blank">ONPE</a>
+            </div>
+        </div>
+
+    </div>
+
+<script>
+const DATA_URL = 'https://voz.pe/data.json';
+const FETCH_INTERVAL = 2 * 60 * 1000;
+const COUNTDOWN_FROM = 120;
+
+let prevData = null;
+let countdown = COUNTDOWN_FROM;
+let countdownTimer = null;
+let history = [];
+
+function fmt(n) {
+    if (n == null) return '\u2014';
+    const int = String(Math.floor(n));
+    let r = '', c = 0;
+    for (let i = int.length - 1; i >= 0; i--) {
+        if (c > 0 && c % 3 === 0) r = ',' + r;
+        r = int[i] + r;
+        c++;
+    }
+    if (int.length > 6) {
+        const p = r.indexOf(',');
+        r = r.substring(0, p) + "'" + r.substring(p + 1);
+    }
+    return r;
+}
+
+function animateNumber(el, target, duration) {
+    if (typeof target !== 'number') { el.textContent = target; return; }
+    const start = performance.now();
+    const base = Math.max(0, target - Math.floor(target * 0.02));
+    function tick(now) {
+        const t = Math.min((now - start) / duration, 1);
+        const ease = 1 - Math.pow(1 - t, 3);
+        el.textContent = fmt(Math.floor(base + (target - base) * ease));
+        if (t < 1) requestAnimationFrame(tick);
+        else el.textContent = fmt(target);
+    }
+    requestAnimationFrame(tick);
+}
+
+function animatePct(el, target, duration) {
+    const start = performance.now();
+    const base = Math.max(0, target - 0.5);
+    function tick(now) {
+        const t = Math.min((now - start) / duration, 1);
+        const ease = 1 - Math.pow(1 - t, 3);
+        el.textContent = (base + (target - base) * ease).toFixed(3) + '%';
+        if (t < 1) requestAnimationFrame(tick);
+        else el.textContent = target.toFixed(3) + '%';
+    }
+    requestAnimationFrame(tick);
+}
+
+function setStatus(state, msg) {
+    const el = document.getElementById('statusBar');
+    el.className = 'status-bar ' + state;
+    el.textContent = msg;
+    if (state === 'ok') {
+        setTimeout(() => el.style.transform = 'translateY(-100%)', 2000);
+    }
+}
+
+function updateUI(data) {
+    const { actas, sanchez, lopez } = data;
+    const sV = sanchez.totalVotosValidos;
+    const lV = lopez.totalVotosValidos;
+    const diff = Math.abs(sV - lV);
+    const sLead = sV >= lV;
+    const total = sV + lV;
+    const DUR = 2000;
+
+    if (prevData) {
+        const prevDiff = Math.abs(prevData.sanchez.totalVotosValidos - prevData.lopez.totalVotosValidos);
+        const diffChange = diff - prevDiff;
+        if (diffChange !== 0) {
+            addHistory(sLead ? 'Sanchez' : 'Lopez Aliaga', diff, diffChange);
+        }
+    }
+
+    animatePct(document.getElementById('actasPct'), actas.porcentaje, DUR);
+    document.getElementById('actasBarFill').style.width = actas.porcentaje + '%';
+    document.getElementById('actasDetail').textContent = fmt(actas.contabilizadas) + ' de ' + fmt(actas.total) + ' actas';
+
+    animateNumber(document.getElementById('votosSanchez'), sV, DUR);
+    animatePct(document.getElementById('pctSanchez'), sanchez.porcentajeVotosValidos, DUR);
+    animateNumber(document.getElementById('votosLopez'), lV, DUR);
+    animatePct(document.getElementById('pctLopez'), lopez.porcentajeVotosValidos, DUR);
+
+    const pS = document.getElementById('playerS');
+    const pL = document.getElementById('playerL');
+    pS.className = 'cand-card cand-s' + (sLead ? ' lead-s' : '');
+    pL.className = 'cand-card cand-l' + (sLead ? '' : ' lead-l');
+    pS.querySelector('.cand-badge').textContent = sLead ? '2do lugar' : '3er lugar';
+    pL.querySelector('.cand-badge').textContent = sLead ? '3er lugar' : '2do lugar';
+
+    if (prevData) {
+        const prevSLead = prevData.sanchez.totalVotosValidos >= prevData.lopez.totalVotosValidos;
+        if (prevSLead !== sLead) {
+            addHistory('CAMBIO DE POSICION', diff, 0);
+        }
+    }
+
+    document.getElementById('barS').style.width = (sV / total * 100) + '%';
+    document.getElementById('barS').textContent = sanchez.porcentajeVotosValidos.toFixed(3) + '%';
+    document.getElementById('barL').style.width = (lV / total * 100) + '%';
+    document.getElementById('barL').textContent = lopez.porcentajeVotosValidos.toFixed(3) + '%';
+
+    const diffEl = document.getElementById('diffVotos');
+    const diffStart = performance.now();
+    const diffBase = Math.max(0, diff - Math.floor(diff * 0.3));
+    (function tickDiff(now) {
+        const t = Math.min((now - diffStart) / DUR, 1);
+        const ease = 1 - Math.pow(1 - t, 3);
+        diffEl.textContent = '+' + fmt(Math.floor(diffBase + (diff - diffBase) * ease));
+        if (t < 1) requestAnimationFrame(tickDiff);
+        else diffEl.textContent = '+' + fmt(diff);
+    })(performance.now());
+
+    document.getElementById('diffLabel').textContent = 'votos de ventaja para ' + (sLead ? 'Sanchez' : 'Lopez Aliaga');
+
+    const pend = (actas.enviadasJee || 0) + (actas.pendientesJee || 0);
+    document.getElementById('pendingInfo').innerHTML = '<strong>' + fmt(pend) + '</strong> actas sin contabilizar (' + fmt(actas.enviadasJee || 0) + ' en JEE + ' + fmt(actas.pendientesJee || 0) + ' pendientes)';
+    document.getElementById('contextBox').innerHTML = 'Keiko Fujimori (1er lugar) ya asegurada. Solo <strong>' + fmt(diff) + ' votos</strong> separan el 2do del 3er lugar con <strong>' + fmt(pend) + ' actas</strong> por procesar.';
+
+    const ts = new Date(data.timestamp);
+    document.getElementById('timestamp').textContent = 'ONPE \u00B7 ' + ts.toLocaleDateString('es-PE', {timeZone:'America/Lima',day:'2-digit',month:'2-digit',year:'numeric'}) + ' ' + ts.toLocaleTimeString('es-PE', {timeZone:'America/Lima',hour:'2-digit',minute:'2-digit',hour12:true});
+
+    prevData = data;
+    resetCountdown();
+}
+
+function addHistory(leader, diff, change) {
+    const now = new Date();
+    const time = now.toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    history.unshift({ time, leader, diff, change });
+    if (history.length > 50) history.pop();
+    renderHistory();
+}
+
+function renderHistory() {
+    const list = document.getElementById('historyList');
+    if (history.length === 0) return;
+    list.innerHTML = history.map(h => {
+        const cls = h.change > 0 ? 'change-up' : h.change < 0 ? 'change-down' : '';
+        const arrow = h.change > 0 ? '\u25B2' : h.change < 0 ? '\u25BC' : '\u26A1';
+        const sign = h.change > 0 ? '+' : '';
+        const detail = h.change !== 0 ? `(<span class="${cls}">${sign}${fmt(h.change)}</span>)` : '';
+        return `<li><span>${arrow} ${h.leader}: +${fmt(h.diff)} votos ${detail}</span><span class="time">${h.time}</span></li>`;
+    }).join('');
+}
+
+function resetCountdown() {
+    countdown = COUNTDOWN_FROM;
+    if (countdownTimer) clearInterval(countdownTimer);
+    countdownTimer = setInterval(() => {
+        countdown--;
+        if (countdown <= 0) countdown = 0;
+        document.getElementById('nextUpdate').textContent = 'Proxima actualizacion en ' + Math.floor(countdown/60) + ':' + String(countdown%60).padStart(2,'0');
+    }, 1000);
+}
+
+async function fetchData() {
+    try {
+        setStatus('loading', 'Actualizando...');
+        const res = await fetch(DATA_URL);
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const data = await res.json();
+        if (!data.ok) throw new Error('Datos no disponibles');
+        updateUI(data);
+        setStatus('ok', 'Datos actualizados');
+    } catch (err) {
+        console.error('Error:', err.message);
+        setStatus('error', 'Error al cargar datos - reintentando...');
+    }
+}
+
+// Primera carga + polling cada 2 min
+fetchData();
+setInterval(fetchData, FETCH_INTERVAL);
+</script>
+</body>
+</html>
