@@ -593,13 +593,7 @@ function setOnline(n){
   document.getElementById('onlineCount').textContent=f(n);
 }
 
-function connectWS(){
-  const proto=location.protocol==='https:'?'wss':'ws';
-  try{ws=new WebSocket(`${proto}://${location.host}`)}catch{return}
-  ws.onopen=()=>wsLive=true;
-  ws.onmessage=e=>{try{const m=JSON.parse(e.data);if(m.type==='data'){updateUI(m.payload);setStatus('ok','✓');if(m.meta)setOnline(m.meta.online)}else if(m.type==='visitors')setOnline(m.payload.online)}catch{}};
-  ws.onclose=()=>{wsLive=false;setTimeout(connectWS,5000)};
-}
+function connectWS(){}
 
 async function fetchData(auto=false){
   try{
