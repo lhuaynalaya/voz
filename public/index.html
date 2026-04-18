@@ -393,6 +393,60 @@ body.light #ctxBox strong{color:var(--rose)}
   animation:gallo-pow 1.5s ease .3s forwards;
 }
 
+/* ── HELICOPTERO ONPE ── */
+.heli-wrap{
+  position:fixed;top:8%;left:0;right:0;
+  height:160px;z-index:820;
+  pointer-events:none;overflow:hidden;
+}
+.heli{
+  position:absolute;top:0;left:-180px;
+  display:flex;flex-direction:column;align-items:center;
+  animation:heli-fly 6s linear forwards;
+}
+@keyframes heli-fly{
+  0%{left:-180px}
+  100%{left:calc(100% + 180px)}
+}
+.heli-icon{font-size:50px;line-height:1;animation:heli-bob .3s ease-in-out infinite alternate}
+@keyframes heli-bob{0%{transform:translateY(0)}100%{transform:translateY(-6px)}}
+.heli-banner{
+  background:var(--rose);color:#fff;
+  font-family:'Outfit',sans-serif;font-weight:900;
+  font-size:11px;letter-spacing:1.5px;
+  padding:3px 12px;border-radius:6px;
+  margin-top:-4px;
+  box-shadow:0 2px 10px var(--rose-glow);
+}
+.heli-drop{
+  position:absolute;
+  font-size:20px;
+  pointer-events:none;
+  animation:heli-drop-fall var(--hd-dur,2.5s) var(--hd-delay,0s) ease-in forwards;
+}
+@keyframes heli-drop-fall{
+  0%{opacity:1;transform:translateY(0) rotate(0deg)}
+  60%{opacity:1}
+  100%{opacity:0;transform:translateY(calc(80vh)) rotate(var(--hd-rot,360deg))}
+}
+.heli-msg{
+  position:fixed;top:18%;left:50%;
+  transform:translate(-50%,-50%) scale(0);
+  font-family:'Outfit',sans-serif;font-weight:900;
+  font-size:18px;color:var(--rose-hi);
+  text-shadow:0 2px 8px rgba(0,0,0,.4);
+  white-space:nowrap;pointer-events:none;
+  z-index:821;
+  animation:heli-msg-pop 2.5s ease 3.5s forwards;
+}
+@keyframes heli-msg-pop{
+  0%{opacity:0;transform:translate(-50%,-50%) scale(0) rotate(-5deg)}
+  20%{opacity:1;transform:translate(-50%,-50%) scale(1.2) rotate(3deg)}
+  40%{transform:translate(-50%,-50%) scale(1) rotate(0)}
+  80%{opacity:1}
+  100%{opacity:0;transform:translate(-50%,-50%) scale(.8)}
+}
+
 /* ── CHAT BUBBLES ── */
 .chat-bubble{
   position:fixed;
@@ -1479,6 +1533,81 @@ function peloteaGallos(){
 // First at 12s, then every 35s
 setTimeout(peloteaGallos, 12000);
 setInterval(peloteaGallos, 35000);
+
+/* ── HELICOPTERO ONPE ── */
+let heliActive = false;
+
+function launchHeli(){
+  if(heliActive) return;
+  heliActive = true;
+
+  const wrap = document.createElement('div');
+  wrap.className = 'heli-wrap';
+
+  const heli = document.createElement('div');
+  heli.className = 'heli';
+
+  const icon = document.createElement('div');
+  icon.className = 'heli-icon';
+  icon.textContent = '🚁';
+
+  const banner = document.createElement('div');
+  banner.className = 'heli-banner';
+  banner.textContent = '📋 ONPE';
+
+  heli.appendChild(icon);
+  heli.appendChild(banner);
+  wrap.appendChild(heli);
+  document.body.appendChild(wrap);
+
+  // Drop actas while flying
+  const drops = ['📋','📨','📄','🗳️','📊','📋','📨','📄'];
+  let dropCount = 0;
+  const dropInterval = setInterval(()=>{
+    if(dropCount >= 12){ clearInterval(dropInterval); return; }
+    const drop = document.createElement('div');
+    drop.className = 'heli-drop';
+    drop.textContent = drops[Math.floor(Math.random()*drops.length)];
+
+    // Position near helicopter
+    const heliRect = heli.getBoundingClientRect();
+    drop.style.left = heliRect.left + Math.random()*40 + 'px';
+    drop.style.top = heliRect.bottom + 'px';
+    drop.style.position = 'fixed';
+    drop.style.setProperty('--hd-dur', (2+Math.random()*1.5)+'s');
+    drop.style.setProperty('--hd-delay', '0s');
+    drop.style.setProperty('--hd-rot', (360+Math.random()*720)+'deg');
+
+    document.body.appendChild(drop);
+    setTimeout(()=>drop.remove(), 4000);
+    dropCount++;
+  }, 350);
+
+  // Message at the end
+  const msg = document.createElement('div');
+  msg.className = 'heli-msg';
+  const mensajes = [
+    '📋 Llegaron mas actas!',
+    '🚁 ONPE entregando resultados!',
+    '📊 Actas en camino!',
+    '🗳️ Delivery de democracia!',
+    '📨 Correo electoral urgente!',
+    '🚁 Cargamento de actas!',
+  ];
+  msg.textContent = mensajes[Math.floor(Math.random()*mensajes.length)];
+  document.body.appendChild(msg);
+
+  // Cleanup
+  setTimeout(()=>{
+    wrap.remove();
+    msg.remove();
+    heliActive = false;
+  }, 7000);
+}
+
+// First at 15s, then every 40s
+setTimeout(launchHeli, 15000);
+setInterval(launchHeli, 40000);
 
 /* ── CONFETTI RAIN on leader ── */
 const CONFETTI_EMOJIS = ['🎉','🎊','✨','⭐','🌟','🔥','🇵🇪','💪','🏆','👑','🥇','💫','🎆','🎇'];
