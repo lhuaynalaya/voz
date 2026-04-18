@@ -291,6 +291,108 @@ body.light #ctxBox strong{color:var(--rose)}
   100%{opacity:0;transform:translateY(calc(100vh + 40px)) rotate(var(--spin,720deg)) scale(.6)}
 }
 
+/* ── PELEA DE GALLOS ── */
+.gallo-arena{
+  position:fixed;
+  top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  z-index:850;
+  pointer-events:none;
+  width:340px;height:200px;
+}
+.gallo{
+  position:absolute;
+  font-size:50px;
+  top:50%;
+  transform:translateY(-50%);
+  transition:none;
+}
+.gallo-left{left:-60px}
+.gallo-right{right:-60px;transform:translateY(-50%) scaleX(-1)}
+
+@keyframes gallo-run-left{
+  0%{left:-60px}
+  100%{left:110px}
+}
+@keyframes gallo-run-right{
+  0%{right:-60px}
+  100%{right:110px}
+}
+@keyframes gallo-fight{
+  0%{transform:translateY(-50%) rotate(0deg) scale(1)}
+  10%{transform:translateY(-60%) rotate(-15deg) scale(1.2)}
+  20%{transform:translateY(-40%) rotate(12deg) scale(1.1)}
+  30%{transform:translateY(-55%) rotate(-10deg) scale(1.3)}
+  40%{transform:translateY(-45%) rotate(8deg) scale(1.15)}
+  50%{transform:translateY(-50%) rotate(-5deg) scale(1.25)}
+  60%{transform:translateY(-48%) rotate(6deg) scale(1.1)}
+  70%{transform:translateY(-52%) rotate(-4deg) scale(1.2)}
+  80%{transform:translateY(-50%) rotate(3deg) scale(1.1)}
+  90%{transform:translateY(-50%) rotate(-2deg) scale(1.05)}
+  100%{transform:translateY(-50%) rotate(0deg) scale(1)}
+}
+@keyframes gallo-fight-r{
+  0%{transform:translateY(-50%) scaleX(-1) rotate(0deg) scale(1)}
+  10%{transform:translateY(-60%) scaleX(-1) rotate(15deg) scale(1.2)}
+  20%{transform:translateY(-40%) scaleX(-1) rotate(-12deg) scale(1.1)}
+  30%{transform:translateY(-55%) scaleX(-1) rotate(10deg) scale(1.3)}
+  40%{transform:translateY(-45%) scaleX(-1) rotate(-8deg) scale(1.15)}
+  50%{transform:translateY(-50%) scaleX(-1) rotate(5deg) scale(1.25)}
+  60%{transform:translateY(-48%) scaleX(-1) rotate(-6deg) scale(1.1)}
+  70%{transform:translateY(-52%) scaleX(-1) rotate(4deg) scale(1.2)}
+  80%{transform:translateY(-50%) scaleX(-1) rotate(-3deg) scale(1.1)}
+  90%{transform:translateY(-50%) scaleX(-1) rotate(2deg) scale(1.05)}
+  100%{transform:translateY(-50%) scaleX(-1) rotate(0deg) scale(1)}
+}
+@keyframes gallo-win{
+  0%{transform:translateY(-50%) scale(1)}
+  30%{transform:translateY(-70%) scale(1.4) rotate(-10deg)}
+  50%{transform:translateY(-50%) scale(1.3) rotate(5deg)}
+  70%{transform:translateY(-65%) scale(1.35) rotate(-5deg)}
+  100%{transform:translateY(-50%) scale(1.2) rotate(0deg)}
+}
+@keyframes gallo-lose{
+  0%{transform:translateY(-50%) scale(1);opacity:1}
+  30%{transform:translateY(-30%) scale(.8) rotate(20deg);opacity:.8}
+  100%{transform:translateY(100px) scale(.5) rotate(45deg);opacity:0}
+}
+@keyframes gallo-lose-r{
+  0%{transform:translateY(-50%) scaleX(-1) scale(1);opacity:1}
+  30%{transform:translateY(-30%) scaleX(-1) scale(.8) rotate(-20deg);opacity:.8}
+  100%{transform:translateY(100px) scaleX(-1) scale(.5) rotate(-45deg);opacity:0}
+}
+@keyframes pluma-fly{
+  0%{opacity:1;transform:translate(0,0) rotate(0deg) scale(1)}
+  100%{opacity:0;transform:translate(var(--px),var(--py)) rotate(var(--pr)) scale(.4)}
+}
+.pluma{
+  position:absolute;top:50%;left:50%;
+  font-size:16px;pointer-events:none;
+  animation:pluma-fly .8s ease-out forwards;
+  animation-delay:var(--pd,0s);
+}
+@keyframes gallo-pow{
+  0%{opacity:0;transform:translate(-50%,-50%) scale(0) rotate(-15deg)}
+  20%{opacity:1;transform:translate(-50%,-50%) scale(1.5) rotate(5deg)}
+  50%{transform:translate(-50%,-50%) scale(1.2) rotate(-3deg)}
+  100%{opacity:0;transform:translate(-50%,-50%) scale(.5)}
+}
+.gallo-impact{
+  position:absolute;top:45%;left:50%;
+  font-family:'Outfit',sans-serif;font-weight:900;font-size:32px;
+  color:#fbbf24;text-shadow:0 0 15px rgba(0,0,0,.7),2px 2px 0 rgba(0,0,0,.5);
+  white-space:nowrap;pointer-events:none;
+  animation:gallo-pow 1s ease forwards;
+}
+.gallo-result{
+  position:absolute;top:15%;left:50%;transform:translate(-50%,-50%);
+  font-family:'Outfit',sans-serif;font-weight:900;font-size:18px;
+  color:#fff;text-shadow:0 0 10px rgba(0,0,0,.6);
+  white-space:nowrap;pointer-events:none;
+  opacity:0;
+  animation:gallo-pow 1.5s ease .3s forwards;
+}
+
 /* ── CHAT BUBBLES ── */
 .chat-bubble{
   position:fixed;
@@ -1219,6 +1321,112 @@ function triggerClash(){
 // Clash every 25 seconds + first one at 5s
 setTimeout(triggerClash, 5000);
 setInterval(triggerClash, 25000);
+
+/* ── PELEA DE GALLOS ── */
+let galloActive = false;
+
+function peloteaGallos(){
+  if(galloActive) return;
+  galloActive = true;
+
+  const arena = document.createElement('div');
+  arena.className = 'gallo-arena';
+
+  const galloL = document.createElement('div');
+  galloL.className = 'gallo gallo-left';
+  galloL.textContent = '🐓';
+
+  const galloR = document.createElement('div');
+  galloR.className = 'gallo gallo-right';
+  galloR.textContent = '🐓';
+
+  // Label under each rooster
+  const labelL = document.createElement('div');
+  labelL.style.cssText = 'position:absolute;bottom:-5px;left:50%;transform:translateX(-50%);font-family:Outfit,sans-serif;font-weight:900;font-size:10px;color:var(--rose-hi);white-space:nowrap;text-shadow:0 1px 4px rgba(0,0,0,.5)';
+  labelL.textContent = 'SÁNCHEZ';
+  galloL.appendChild(labelL);
+
+  const labelR = document.createElement('div');
+  labelR.style.cssText = 'position:absolute;bottom:-5px;left:50%;transform:translateX(-50%) scaleX(-1);font-family:Outfit,sans-serif;font-weight:900;font-size:10px;color:#60a5fa;white-space:nowrap;text-shadow:0 1px 4px rgba(0,0,0,.5)';
+  labelR.textContent = 'LÓPEZ A.';
+  galloR.appendChild(labelR);
+
+  arena.appendChild(galloL);
+  arena.appendChild(galloR);
+  document.body.appendChild(arena);
+
+  // Phase 1: Run toward each other (1.2s)
+  galloL.style.animation = 'gallo-run-left 1.2s ease-in forwards';
+  galloR.style.animation = 'gallo-run-right 1.2s ease-in forwards';
+
+  // Phase 2: Collision (at 1.2s)
+  setTimeout(()=>{
+    // POW impact
+    const pow = document.createElement('div');
+    pow.className = 'gallo-impact';
+    const pows = ['💥 POW!','💢 PAM!','👊 TOMA!','⚡ ZAS!','💥 CRACK!','🔥 BUM!'];
+    pow.textContent = pows[Math.floor(Math.random()*pows.length)];
+    arena.appendChild(pow);
+    setTimeout(()=>pow.remove(), 1100);
+
+    // Feathers
+    const plumas = ['🪶','🪶','🪶','💫','✨','⭐'];
+    for(let i=0;i<10;i++){
+      const p = document.createElement('span');
+      p.className = 'pluma';
+      p.textContent = plumas[Math.floor(Math.random()*plumas.length)];
+      const angle = Math.random()*Math.PI*2;
+      const dist = 40+Math.random()*80;
+      p.style.setProperty('--px', Math.cos(angle)*dist+'px');
+      p.style.setProperty('--py', Math.sin(angle)*dist+'px');
+      p.style.setProperty('--pr', (Math.random()*720-360)+'deg');
+      p.style.setProperty('--pd', (Math.random()*.3)+'s');
+      arena.appendChild(p);
+      setTimeout(()=>p.remove(), 1200);
+    }
+
+    // Fight animation
+    galloL.style.animation = 'gallo-fight 1.5s ease';
+    galloR.style.animation = 'gallo-fight-r 1.5s ease';
+  }, 1200);
+
+  // Phase 3: Winner! (at 3s)
+  setTimeout(()=>{
+    const sLead = burstLeader === 's';
+
+    if(sLead){
+      galloL.style.animation = 'gallo-win 1s ease forwards';
+      galloR.style.animation = 'gallo-lose-r 1s ease forwards';
+    } else {
+      galloR.style.animation = 'gallo-win 1s ease forwards';
+      galloL.style.animation = 'gallo-lose 1s ease forwards';
+    }
+
+    // Winner text
+    const winner = sLead ? 'SÁNCHEZ' : 'LÓPEZ A.';
+    const result = document.createElement('div');
+    result.className = 'gallo-result';
+    result.textContent = `🏆 ${winner} GANA! 🐓👑`;
+    arena.appendChild(result);
+
+    // Ki ki ri ki
+    const kiki = document.createElement('div');
+    kiki.style.cssText = 'position:absolute;top:70%;left:50%;transform:translate(-50%,-50%);font-family:Outfit,sans-serif;font-weight:900;font-size:14px;color:#fbbf24;text-shadow:0 1px 6px rgba(0,0,0,.5);white-space:nowrap;opacity:0;animation:gallo-pow 1.5s ease .6s forwards';
+    kiki.textContent = '🗣️ KI KI RI KIII!';
+    arena.appendChild(kiki);
+  }, 3000);
+
+  // Cleanup
+  setTimeout(()=>{
+    arena.style.transition = 'opacity .5s';
+    arena.style.opacity = '0';
+    setTimeout(()=>{arena.remove(); galloActive = false;}, 600);
+  }, 5000);
+}
+
+// First at 12s, then every 35s
+setTimeout(peloteaGallos, 12000);
+setInterval(peloteaGallos, 35000);
 
 /* ── CONFETTI RAIN on leader ── */
 const CONFETTI_EMOJIS = ['🎉','🎊','✨','⭐','🌟','🔥','🇵🇪','💪','🏆','👑','🥇','💫','🎆','🎇'];
