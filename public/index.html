@@ -309,9 +309,10 @@ body.light #ctxBox strong{color:var(--rose)}
       <!-- Sánchez -->
       <div id="fightS" style="display:flex;flex-direction:column;align-items:center;text-align:center;padding:0 6px">
         <span id="fbadgeS" class="badge-rose" style="font-size:12px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;padding:5px 14px;border-radius:99px;margin-bottom:8px;display:inline-block">2do lugar</span>
-        <div id="ringS" class="floating ring-rose" style="width:clamp(96px,22vw,118px);height:clamp(96px,22vw,118px);border-radius:50%;margin-bottom:8px;transition:all .4s;flex-shrink:0;position:relative;overflow:visible">
+        <div id="ringS" class="floating ring-rose" onclick="react('s')" style="cursor:pointer;width:clamp(96px,22vw,118px);height:clamp(96px,22vw,118px);border-radius:50%;margin-bottom:8px;transition:all .4s;flex-shrink:0;position:relative;overflow:visible">
           <img src="/img/sanchez.jpg" alt="Sánchez" draggable="false" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block">
         </div>
+        <div id="reactS" style="font-size:12px;font-weight:800;color:var(--rose-hi);margin-bottom:4px;cursor:pointer;user-select:none" onclick="react('s')">👆 Dale click · <span id="reactCountS">0</span></div>
         <div id="firesS" style="font-size:17px;min-height:22px;margin-bottom:5px;letter-spacing:3px">🔥🔥</div>
         <div style="font-family:'Outfit',sans-serif;font-weight:900;font-size:clamp(16px,3.8vw,20px);line-height:1.2;color:var(--txt);margin-bottom:3px">Roberto<br>Sánchez</div>
         <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--txt2);margin-bottom:7px">Juntos por el Perú</div>
@@ -327,9 +328,10 @@ body.light #ctxBox strong{color:var(--rose)}
       <!-- López -->
       <div id="fightL" style="display:flex;flex-direction:column;align-items:center;text-align:center;padding:0 6px">
         <span id="fbadgeL" class="badge-dim" style="font-size:12px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;padding:5px 14px;border-radius:99px;margin-bottom:8px;display:inline-block">3er lugar</span>
-        <div id="ringL" class="ring-dim" style="width:clamp(96px,22vw,118px);height:clamp(96px,22vw,118px);border-radius:50%;margin-bottom:8px;transition:all .4s;flex-shrink:0;position:relative;overflow:visible">
+        <div id="ringL" class="ring-dim" onclick="react('l')" style="cursor:pointer;width:clamp(96px,22vw,118px);height:clamp(96px,22vw,118px);border-radius:50%;margin-bottom:8px;transition:all .4s;flex-shrink:0;position:relative;overflow:visible">
           <img src="/img/lopezaliaga.jpg" alt="López Aliaga" draggable="false" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block">
         </div>
+        <div id="reactL" style="font-size:12px;font-weight:800;color:var(--txt2);margin-bottom:4px;cursor:pointer;user-select:none" onclick="react('l')">👆 Dale click · <span id="reactCountL">0</span></div>
         <div id="firesL" style="font-size:17px;min-height:22px;margin-bottom:5px;letter-spacing:3px;opacity:.4">🔥🔥🔥🔥</div>
         <div style="font-family:'Outfit',sans-serif;font-weight:900;font-size:clamp(16px,3.8vw,20px);line-height:1.2;color:var(--txt);margin-bottom:3px">Rafael<br>López Aliaga</div>
         <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--txt2);margin-bottom:7px">Renovación Popular</div>
@@ -829,6 +831,36 @@ function showCastillistaCloud(){
 
 setTimeout(showCastillistaCloud, 2500);
 setInterval(showCastillistaCloud, 11000);
+
+/* ── REACTIONS ── */
+let reactCounts = JSON.parse(localStorage.getItem('vtv-reacts')||'{"s":0,"l":0}');
+document.getElementById('reactCountS').textContent = fmt(reactCounts.s);
+document.getElementById('reactCountL').textContent = fmt(reactCounts.l);
+
+function react(side){
+  reactCounts[side]++;
+  localStorage.setItem('vtv-reacts', JSON.stringify(reactCounts));
+  const countEl = document.getElementById(side==='s'?'reactCountS':'reactCountL');
+  countEl.textContent = fmt(reactCounts[side]);
+
+  // Burst emojis
+  burst(side);
+
+  // Floating +1
+  const ring = document.getElementById(side==='s'?'ringS':'ringL');
+  const plus = document.createElement('div');
+  plus.textContent = '+1';
+  plus.style.cssText = 'position:absolute;top:40%;left:50%;transform:translate(-50%,0);font-family:Outfit,sans-serif;font-weight:900;font-size:22px;color:var(--rose-hi);pointer-events:none;z-index:60;opacity:1;transition:all .7s ease;text-shadow:0 2px 8px rgba(0,0,0,.5)';
+  ring.appendChild(plus);
+  requestAnimationFrame(()=>{
+    plus.style.transform = 'translate(-50%,-40px) scale(1.3)';
+    plus.style.opacity = '0';
+  });
+  setTimeout(()=>plus.remove(), 750);
+
+  // Haptic feedback (mobile)
+  if(navigator.vibrate) navigator.vibrate(30);
+}
 
 </script>
 </body>
