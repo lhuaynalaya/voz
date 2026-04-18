@@ -229,6 +229,87 @@ body.light #ctxBox strong{color:var(--rose)}
   75%    {transform:translate(-50%,30px) scaleY(.9); opacity:.75}
   95%    {transform:translate(-50%,40px) scaleY(.3); opacity:0}
 }
+/* ── UPDATE ALERT ── */
+.update-overlay{
+  position:fixed;inset:0;z-index:8000;
+  display:flex;align-items:center;justify-content:center;
+  pointer-events:none;
+}
+.update-overlay .alert-bg{
+  position:absolute;inset:0;
+  background:radial-gradient(ellipse at center,rgba(159,18,57,.25) 0%,rgba(0,0,0,.7) 100%);
+  animation:alert-bg-in .3s ease forwards;
+}
+@keyframes alert-bg-in{0%{opacity:0}100%{opacity:1}}
+
+.update-overlay .alert-box{
+  position:relative;z-index:1;
+  background:linear-gradient(135deg,#1a1a1a,#0a0a0a);
+  border:2px solid var(--rose);
+  border-radius:20px;
+  padding:28px 36px;
+  text-align:center;
+  box-shadow:0 0 60px var(--rose-glow),0 0 120px rgba(159,18,57,.2);
+  animation:alert-box-in .4s cubic-bezier(.34,1.56,.64,1) forwards;
+  max-width:420px;
+  width:90%;
+}
+@keyframes alert-box-in{0%{opacity:0;transform:scale(.5) rotate(-3deg)}100%{opacity:1;transform:scale(1) rotate(0)}}
+
+.update-overlay .alert-icon{
+  font-size:48px;
+  animation:alert-icon-bounce .6s ease;
+  margin-bottom:8px;
+}
+@keyframes alert-icon-bounce{0%{transform:scale(0) rotate(-20deg)}50%{transform:scale(1.3) rotate(5deg)}100%{transform:scale(1) rotate(0)}}
+
+.update-overlay .alert-title{
+  font-family:'Outfit',sans-serif;
+  font-weight:900;font-size:22px;
+  color:#fff;margin-bottom:4px;
+  text-transform:uppercase;letter-spacing:1px;
+}
+.update-overlay .alert-diff{
+  font-family:'Outfit',sans-serif;
+  font-weight:900;font-size:38px;
+  color:var(--rose-hi);
+  margin:6px 0;
+}
+.update-overlay .alert-detail{
+  font-size:14px;color:#a3a3a3;
+  line-height:1.5;
+}
+.update-overlay .alert-detail strong{color:#fbbf24}
+
+.update-overlay .alert-bar{
+  margin-top:14px;height:4px;
+  background:rgba(255,255,255,.1);
+  border-radius:2px;overflow:hidden;
+}
+.update-overlay .alert-bar-fill{
+  height:100%;background:var(--rose);
+  border-radius:2px;
+  animation:alert-bar-drain 3.5s linear forwards;
+}
+@keyframes alert-bar-drain{0%{width:100%}100%{width:0%}}
+
+/* screen flash on update */
+@keyframes screen-flash{
+  0%{box-shadow:inset 0 0 0 0 transparent}
+  15%{box-shadow:inset 0 0 80px 20px rgba(159,18,57,.3)}
+  100%{box-shadow:inset 0 0 0 0 transparent}
+}
+.screen-flash{animation:screen-flash .8s ease}
+
+/* number pop */
+@keyframes num-pop{
+  0%{transform:scale(1)}
+  30%{transform:scale(1.15)}
+  60%{transform:scale(.95)}
+  100%{transform:scale(1)}
+}
+.num-pop{animation:num-pop .5s ease}
+
 @keyframes impact-pop{
   0%  {transform:translate(-50%,-50%) scale(0) rotate(-14deg);opacity:1}
   30% {transform:translate(-50%,-50%) scale(1.3) rotate(6deg); opacity:1}
@@ -309,10 +390,9 @@ body.light #ctxBox strong{color:var(--rose)}
       <!-- Sánchez -->
       <div id="fightS" style="display:flex;flex-direction:column;align-items:center;text-align:center;padding:0 6px">
         <span id="fbadgeS" class="badge-rose" style="font-size:12px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;padding:5px 14px;border-radius:99px;margin-bottom:8px;display:inline-block">2do lugar</span>
-        <div id="ringS" class="floating ring-rose" onclick="react('s')" style="cursor:pointer;width:clamp(96px,22vw,118px);height:clamp(96px,22vw,118px);border-radius:50%;margin-bottom:8px;transition:all .4s;flex-shrink:0;position:relative;overflow:visible">
+        <div id="ringS" class="floating ring-rose" style="width:clamp(96px,22vw,118px);height:clamp(96px,22vw,118px);border-radius:50%;margin-bottom:8px;transition:all .4s;flex-shrink:0;position:relative;overflow:visible">
           <img src="/img/sanchez.jpg" alt="Sánchez" draggable="false" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block">
         </div>
-        <div id="reactS" style="font-size:12px;font-weight:800;color:var(--rose-hi);margin-bottom:4px;cursor:pointer;user-select:none" onclick="react('s')">👆 Dale click · <span id="reactCountS">0</span></div>
         <div id="firesS" style="font-size:17px;min-height:22px;margin-bottom:5px;letter-spacing:3px">🔥🔥</div>
         <div style="font-family:'Outfit',sans-serif;font-weight:900;font-size:clamp(16px,3.8vw,20px);line-height:1.2;color:var(--txt);margin-bottom:3px">Roberto<br>Sánchez</div>
         <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--txt2);margin-bottom:7px">Juntos por el Perú</div>
@@ -328,10 +408,9 @@ body.light #ctxBox strong{color:var(--rose)}
       <!-- López -->
       <div id="fightL" style="display:flex;flex-direction:column;align-items:center;text-align:center;padding:0 6px">
         <span id="fbadgeL" class="badge-dim" style="font-size:12px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;padding:5px 14px;border-radius:99px;margin-bottom:8px;display:inline-block">3er lugar</span>
-        <div id="ringL" class="ring-dim" onclick="react('l')" style="cursor:pointer;width:clamp(96px,22vw,118px);height:clamp(96px,22vw,118px);border-radius:50%;margin-bottom:8px;transition:all .4s;flex-shrink:0;position:relative;overflow:visible">
+        <div id="ringL" class="ring-dim" style="width:clamp(96px,22vw,118px);height:clamp(96px,22vw,118px);border-radius:50%;margin-bottom:8px;transition:all .4s;flex-shrink:0;position:relative;overflow:visible">
           <img src="/img/lopezaliaga.jpg" alt="López Aliaga" draggable="false" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block">
         </div>
-        <div id="reactL" style="font-size:12px;font-weight:800;color:var(--txt2);margin-bottom:4px;cursor:pointer;user-select:none" onclick="react('l')">👆 Dale click · <span id="reactCountL">0</span></div>
         <div id="firesL" style="font-size:17px;min-height:22px;margin-bottom:5px;letter-spacing:3px;opacity:.4">🔥🔥🔥🔥</div>
         <div style="font-family:'Outfit',sans-serif;font-weight:900;font-size:clamp(16px,3.8vw,20px);line-height:1.2;color:var(--txt);margin-bottom:3px">Rafael<br>López Aliaga</div>
         <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--txt2);margin-bottom:7px">Renovación Popular</div>
@@ -569,6 +648,10 @@ function updateUI(data){
   }
 
   burstLeader = sLead ? 's' : 'l';
+
+  // Show update alert (skip first load)
+  if(prevData) showUpdateAlert(data, prevData);
+
   prevData=data;resetCD();
 
   // Ocultar splash
@@ -832,34 +915,78 @@ function showCastillistaCloud(){
 setTimeout(showCastillistaCloud, 2500);
 setInterval(showCastillistaCloud, 11000);
 
-/* ── REACTIONS ── */
-let reactCounts = JSON.parse(localStorage.getItem('vtv-reacts')||'{"s":0,"l":0}');
-document.getElementById('reactCountS').textContent = fmt(reactCounts.s);
-document.getElementById('reactCountL').textContent = fmt(reactCounts.l);
+/* ── UPDATE ALERT (breaking news style) ── */
+function showUpdateAlert(data, prevD){
+  const {sanchez, lopez, actas} = data;
+  const sV = sanchez.totalVotosValidos, lV = lopez.totalVotosValidos;
+  const diff = Math.abs(sV - lV);
+  const sLead = sV >= lV;
+  const leader = sLead ? 'Sánchez' : 'López Aliaga';
+  const pend = (actas.enviadasJee||0) + (actas.pendientesJee||0);
 
-function react(side){
-  reactCounts[side]++;
-  localStorage.setItem('vtv-reacts', JSON.stringify(reactCounts));
-  const countEl = document.getElementById(side==='s'?'reactCountS':'reactCountL');
-  countEl.textContent = fmt(reactCounts[side]);
+  let diffChange = 0;
+  if(prevD){
+    const pd = Math.abs(prevD.sanchez.totalVotosValidos - prevD.lopez.totalVotosValidos);
+    diffChange = diff - pd;
+  }
 
-  // Burst emojis
-  burst(side);
+  const prevSLead = prevD ? prevD.sanchez.totalVotosValidos >= prevD.lopez.totalVotosValidos : sLead;
+  const leadChanged = prevD && prevSLead !== sLead;
 
-  // Floating +1
-  const ring = document.getElementById(side==='s'?'ringS':'ringL');
-  const plus = document.createElement('div');
-  plus.textContent = '+1';
-  plus.style.cssText = 'position:absolute;top:40%;left:50%;transform:translate(-50%,0);font-family:Outfit,sans-serif;font-weight:900;font-size:22px;color:var(--rose-hi);pointer-events:none;z-index:60;opacity:1;transition:all .7s ease;text-shadow:0 2px 8px rgba(0,0,0,.5)';
-  ring.appendChild(plus);
-  requestAnimationFrame(()=>{
-    plus.style.transform = 'translate(-50%,-40px) scale(1.3)';
-    plus.style.opacity = '0';
-  });
-  setTimeout(()=>plus.remove(), 750);
+  let icon, title, diffText;
+  if(leadChanged){
+    icon = '🔄🚨';
+    title = '¡CAMBIO DE POSICIÓN!';
+    diffText = `${leader} toma el 2do lugar`;
+  } else if(Math.abs(diffChange) > 2000){
+    icon = diffChange > 0 ? '📈🔥' : '📉⚡';
+    title = diffChange > 0 ? '¡BRECHA SE DISPARA!' : '¡SE ACERCAN!';
+    diffText = `Diferencia ${diffChange > 0 ? 'sube' : 'baja'} ${fmt(Math.abs(diffChange))} votos`;
+  } else {
+    icon = '🗳️📊';
+    title = 'DATOS ACTUALIZADOS';
+    diffText = `${leader} lidera por ${fmt(diff)} votos`;
+  }
 
-  // Haptic feedback (mobile)
-  if(navigator.vibrate) navigator.vibrate(30);
+  // Screen flash
+  document.body.classList.remove('screen-flash');
+  void document.body.offsetWidth;
+  document.body.classList.add('screen-flash');
+  setTimeout(()=>document.body.classList.remove('screen-flash'), 900);
+
+  // Number pop on diff
+  const diffEl = document.getElementById('diffVotos');
+  diffEl.classList.remove('num-pop');void diffEl.offsetWidth;
+  diffEl.classList.add('num-pop');
+
+  // Overlay alert
+  const overlay = document.createElement('div');
+  overlay.className = 'update-overlay';
+  overlay.innerHTML = `
+    <div class="alert-bg"></div>
+    <div class="alert-box">
+      <div class="alert-icon">${icon}</div>
+      <div class="alert-title">${title}</div>
+      <div class="alert-diff">+${fmt(diff)}</div>
+      <div class="alert-detail">
+        ${diffText}<br>
+        <strong>${fmt(pend)} actas</strong> por procesar · ${actas.porcentaje.toFixed(2)}% contabilizado
+      </div>
+      <div class="alert-bar"><div class="alert-bar-fill"></div></div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+
+  // Burst emojis on both sides
+  burst(sLead ? 's' : 'l');
+  setTimeout(()=>burst(sLead ? 's' : 'l'), 300);
+
+  // Remove after 3.5s
+  setTimeout(()=>{
+    overlay.style.opacity = '0';
+    overlay.style.transition = 'opacity .4s ease';
+    setTimeout(()=>overlay.remove(), 450);
+  }, 3500);
 }
 
 </script>
