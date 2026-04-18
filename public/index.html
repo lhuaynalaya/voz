@@ -229,6 +229,68 @@ body.light #ctxBox strong{color:var(--rose)}
   75%    {transform:translate(-50%,30px) scaleY(.9); opacity:.75}
   95%    {transform:translate(-50%,40px) scaleY(.3); opacity:0}
 }
+/* ── VERSUS CLASH ── */
+@keyframes clash-left{
+  0%{transform:translateX(0) scale(1)}
+  15%{transform:translateX(65%) scale(1.2) rotate(-8deg)}
+  20%{transform:translateX(55%) scale(1.3) rotate(5deg)}
+  25%{transform:translateX(62%) scale(1.25) rotate(-4deg)}
+  30%{transform:translateX(50%) scale(1.2) rotate(3deg)}
+  40%{transform:translateX(55%) scale(1.15) rotate(-2deg)}
+  55%{transform:translateX(45%) scale(1.1) rotate(1deg)}
+  100%{transform:translateX(0) scale(1) rotate(0)}
+}
+@keyframes clash-right{
+  0%{transform:translateX(0) scale(1)}
+  15%{transform:translateX(-65%) scale(1.2) rotate(8deg)}
+  20%{transform:translateX(-55%) scale(1.3) rotate(-5deg)}
+  25%{transform:translateX(-62%) scale(1.25) rotate(4deg)}
+  30%{transform:translateX(-50%) scale(1.2) rotate(-3deg)}
+  40%{transform:translateX(-55%) scale(1.15) rotate(2deg)}
+  55%{transform:translateX(-45%) scale(1.1) rotate(-1deg)}
+  100%{transform:translateX(0) scale(1) rotate(0)}
+}
+@keyframes clash-flash-burst{
+  0%{opacity:0;transform:translate(-50%,-50%) scale(0)}
+  15%{opacity:1;transform:translate(-50%,-50%) scale(1.5)}
+  25%{opacity:.8;transform:translate(-50%,-50%) scale(2)}
+  40%{opacity:0;transform:translate(-50%,-50%) scale(2.5)}
+  100%{opacity:0;transform:translate(-50%,-50%) scale(0)}
+}
+@keyframes clash-shake{
+  0%,100%{transform:translate(0,0)}
+  10%{transform:translate(-5px,3px)}
+  20%{transform:translate(6px,-4px)}
+  30%{transform:translate(-4px,5px)}
+  40%{transform:translate(5px,-3px)}
+  50%{transform:translate(-3px,4px)}
+  60%{transform:translate(4px,-3px)}
+  70%{transform:translate(-2px,2px)}
+  80%{transform:translate(1px,-1px)}
+}
+@keyframes clash-text-pop{
+  0%{opacity:0;transform:translate(-50%,-50%) scale(0) rotate(-20deg)}
+  20%{opacity:1;transform:translate(-50%,-50%) scale(1.4) rotate(5deg)}
+  40%{transform:translate(-50%,-50%) scale(1.1) rotate(-3deg)}
+  60%{transform:translate(-50%,-50%) scale(1.2) rotate(2deg)}
+  80%{opacity:1;transform:translate(-50%,-50%) scale(1) rotate(0)}
+  100%{opacity:0;transform:translate(-50%,-50%) scale(.5) rotate(0)}
+}
+
+/* ── CONFETTI ── */
+.confetti-piece{
+  position:fixed;
+  z-index:800;
+  pointer-events:none;
+  font-size:20px;
+  animation:confetti-fall var(--fall-dur,3s) var(--fall-delay,0s) ease-in forwards;
+}
+@keyframes confetti-fall{
+  0%{opacity:1;transform:translateY(-20px) rotate(0deg) scale(1)}
+  20%{opacity:1}
+  100%{opacity:0;transform:translateY(calc(100vh + 40px)) rotate(var(--spin,720deg)) scale(.6)}
+}
+
 /* ── CHAT BUBBLES ── */
 .chat-bubble{
   position:fixed;
@@ -1097,6 +1159,95 @@ function scheduleBubble(){
   setTimeout(scheduleBubble, next);
 }
 setTimeout(scheduleBubble, 6000);
+
+/* ── VERSUS CLASH ANIMATION ── */
+const CLASH_TEXTS = ['💥 PELEA!','⚡ VERSUS!','🔥 CHOQUE!','💢 FIGHT!','👊 ROUND!','🥊 CLASH!'];
+let clashActive = false;
+
+function triggerClash(){
+  const arena = document.getElementById('battleArena');
+  const ringS = document.getElementById('ringS');
+  const ringL = document.getElementById('ringL');
+  if(!arena || !ringS || !ringL || clashActive) return;
+  clashActive = true;
+
+  // Shake arena
+  arena.style.animation = 'clash-shake .5s ease .6s 1';
+
+  // Animate rings toward each other
+  ringS.style.animation = 'clash-left 3s cubic-bezier(.22,.68,.36,1) forwards';
+  ringL.style.animation = 'clash-right 3s cubic-bezier(.22,.68,.36,1) forwards';
+
+  // Flash in the middle
+  setTimeout(()=>{
+    const flash = document.createElement('div');
+    flash.style.cssText = 'position:absolute;top:35%;left:50%;width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.9) 0%,rgba(255,165,0,.6) 30%,rgba(255,69,0,.3) 60%,transparent 80%);z-index:20;pointer-events:none;animation:clash-flash-burst 1.5s ease forwards';
+    arena.appendChild(flash);
+    setTimeout(()=>flash.remove(), 1600);
+
+    // Impact text
+    const txt = document.createElement('div');
+    const phrase = CLASH_TEXTS[Math.floor(Math.random()*CLASH_TEXTS.length)];
+    txt.style.cssText = 'position:absolute;top:30%;left:50%;z-index:25;pointer-events:none;font-family:Outfit,sans-serif;font-weight:900;font-size:28px;color:#fff;text-shadow:0 0 20px rgba(255,69,0,.8),0 4px 8px rgba(0,0,0,.6);white-space:nowrap;animation:clash-text-pop 2s ease forwards';
+    txt.textContent = phrase;
+    arena.appendChild(txt);
+    setTimeout(()=>txt.remove(), 2100);
+
+    // Sparks
+    for(let i=0;i<8;i++){
+      const spark = document.createElement('span');
+      const emojis = ['⭐','💫','✨','🔥','💥','⚡'];
+      spark.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+      const angle = (Math.PI*2/8)*i + (Math.random()-.5)*.5;
+      const dist = 50+Math.random()*60;
+      spark.className = 'star-particle';
+      spark.style.cssText = `position:absolute;top:35%;left:50%;font-size:${16+Math.random()*12}px;z-index:26;--tx:${Math.cos(angle)*dist}px;--ty:${Math.sin(angle)*dist}px;--rot:${(Math.random()-.5)*400}deg;--dur:.8s;--delay:0s`;
+      arena.appendChild(spark);
+      setTimeout(()=>spark.remove(), 1200);
+    }
+  }, 600);
+
+  // Cleanup
+  setTimeout(()=>{
+    ringS.style.animation = '';
+    ringL.style.animation = '';
+    arena.style.animation = '';
+    clashActive = false;
+  }, 3200);
+}
+
+// Clash every 25 seconds + first one at 5s
+setTimeout(triggerClash, 5000);
+setInterval(triggerClash, 25000);
+
+/* ── CONFETTI RAIN on leader ── */
+const CONFETTI_EMOJIS = ['🎉','🎊','✨','⭐','🌟','🔥','🇵🇪','💪','🏆','👑','🥇','💫','🎆','🎇'];
+
+function spawnConfetti(){
+  const count = 12 + Math.floor(Math.random()*8);
+  for(let i=0;i<count;i++){
+    const piece = document.createElement('div');
+    piece.className = 'confetti-piece';
+    piece.textContent = CONFETTI_EMOJIS[Math.floor(Math.random()*CONFETTI_EMOJIS.length)];
+    const left = 5 + Math.random()*90;
+    const dur = 2.5 + Math.random()*2;
+    const delay = Math.random()*1.5;
+    const spin = 360 + Math.random()*720;
+    const size = 16 + Math.random()*14;
+    piece.style.left = left + '%';
+    piece.style.top = '-30px';
+    piece.style.fontSize = size + 'px';
+    piece.style.setProperty('--fall-dur', dur+'s');
+    piece.style.setProperty('--fall-delay', delay+'s');
+    piece.style.setProperty('--spin', spin+'deg');
+    document.body.appendChild(piece);
+    setTimeout(()=>piece.remove(), (dur+delay)*1000 + 200);
+  }
+}
+
+// Confetti every 30 seconds + first at 8s
+setTimeout(spawnConfetti, 8000);
+setInterval(spawnConfetti, 30000);
 
 /* ── RACHA + PREDICCION ── */
 let streak = { leader: null, count: 0 };
