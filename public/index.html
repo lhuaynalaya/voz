@@ -229,6 +229,43 @@ body.light #ctxBox strong{color:var(--rose)}
   75%    {transform:translate(-50%,30px) scaleY(.9); opacity:.75}
   95%    {transform:translate(-50%,40px) scaleY(.3); opacity:0}
 }
+/* ── CHAT BUBBLES ── */
+.chat-bubble{
+  position:fixed;
+  z-index:900;
+  pointer-events:none;
+  max-width:220px;
+  animation:bubble-float 6s ease-in-out forwards;
+}
+.chat-bubble .bubble-inner{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:16px 16px 16px 4px;
+  padding:10px 14px;
+  box-shadow:0 4px 20px rgba(0,0,0,.3);
+}
+.chat-bubble.right .bubble-inner{
+  border-radius:16px 16px 4px 16px;
+}
+.chat-bubble .bubble-name{
+  font-family:'Outfit',sans-serif;
+  font-weight:800;font-size:10px;
+  text-transform:uppercase;letter-spacing:.5px;
+  margin-bottom:3px;
+}
+.chat-bubble .bubble-name.rose{color:var(--rose-hi)}
+.chat-bubble .bubble-name.blue{color:#60a5fa}
+.chat-bubble .bubble-msg{
+  font-size:13px;font-weight:600;
+  color:var(--txt);line-height:1.4;
+}
+@keyframes bubble-float{
+  0%{opacity:0;transform:translateY(20px) scale(.8)}
+  8%{opacity:1;transform:translateY(0) scale(1)}
+  75%{opacity:1;transform:translateY(-30px) scale(1)}
+  100%{opacity:0;transform:translateY(-60px) scale(.9)}
+}
+
 /* ── UPDATE ALERT ── */
 .update-overlay{
   position:fixed;inset:0;z-index:8000;
@@ -928,6 +965,88 @@ function showCastillistaCloud(){
 
 setTimeout(showCastillistaCloud, 2500);
 setInterval(showCastillistaCloud, 11000);
+
+/* ── CHAT BUBBLES — frases seguras TikTok ── */
+const FRASES_S = [
+  "Vamos con todo Peru 🇵🇪💪",
+  "Segundo lugar y con fe 📈",
+  "El pueblo ha decidido ✊",
+  "Paso a paso, voto a voto 🗳️",
+  "Gracias a todos por confiar 🙏",
+  "Aqui seguimos, firmes 💪",
+  "Que emocion, que nervios 😅",
+  "Cada voto cuenta, gracias Peru 🇵🇪",
+  "Vamos que se puede 🔥",
+  "La esperanza es lo ultimo que se pierde ⭐",
+  "Esto esta muy reñido 😬",
+  "Peru merece lo mejor 🇵🇪",
+  "Gracias por cada voto 🗳️❤️",
+  "Con humildad y trabajo ✊",
+  "A seguir sumando 📊",
+];
+
+const FRASES_L = [
+  "Aun no termina esto 💪",
+  "Esperemos los resultados finales 📋",
+  "Cada acta cuenta, paciencia 🗳️",
+  "Esto no se acaba hasta que se acaba ⏳",
+  "Falta conteo todavia 📊",
+  "La fe es lo ultimo que se pierde 🙏",
+  "Vamos que aun hay actas 📈",
+  "Renovacion siempre 💙",
+  "Gracias a los que confiaron 🤝",
+  "Aqui seguimos de pie 🏃",
+  "Peru decide, respetemos 🇵🇪",
+  "Esperando con paciencia ⏰",
+  "Todo puede pasar todavia 🎲",
+  "No se rindan, falta conteo 📢",
+  "Vamos con actitud positiva ⭐",
+];
+
+let lastBubbleS = -1, lastBubbleL = -1;
+
+function showBubble(side){
+  const frases = side === 's' ? FRASES_S : FRASES_L;
+  let idx;
+  do { idx = Math.floor(Math.random() * frases.length); }
+  while (idx === (side==='s' ? lastBubbleS : lastBubbleL) && frases.length > 1);
+  if(side==='s') lastBubbleS = idx; else lastBubbleL = idx;
+
+  const msg = frases[idx];
+  const bubble = document.createElement('div');
+  bubble.className = 'chat-bubble' + (side==='l' ? ' right' : '');
+
+  const ring = document.getElementById(side==='s' ? 'ringS' : 'ringL');
+  const rect = ring.getBoundingClientRect();
+  const top = rect.top + window.scrollY - 20 + Math.random()*40;
+  const left = side==='s'
+    ? Math.max(8, rect.left - 30 + Math.random()*20)
+    : Math.min(window.innerWidth - 230, rect.right - 190 + Math.random()*20);
+
+  bubble.style.top = top + 'px';
+  bubble.style.left = left + 'px';
+
+  const name = side==='s' ? 'Sánchez' : 'López Aliaga';
+  const nameClass = side==='s' ? 'rose' : 'blue';
+
+  bubble.innerHTML = `
+    <div class="bubble-inner">
+      <div class="bubble-name ${nameClass}">${name}</div>
+      <div class="bubble-msg">${msg}</div>
+    </div>
+  `;
+
+  document.body.appendChild(bubble);
+  setTimeout(()=>bubble.remove(), 6200);
+}
+
+function scheduleBubble(){
+  const side = Math.random() > 0.5 ? 's' : 'l';
+  showBubble(side);
+  const next = 5000 + Math.random() * 3000;
+  setTimeout(scheduleBubble, next);
+}
+setTimeout(scheduleBubble, 6000);
 
 /* ── RACHA + PREDICCION ── */
 let streak = { leader: null, count: 0 };
