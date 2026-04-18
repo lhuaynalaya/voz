@@ -393,6 +393,40 @@ body.light #ctxBox strong{color:var(--rose)}
   animation:gallo-pow 1.5s ease .3s forwards;
 }
 
+/* ── NARRADOR DEPORTIVO ── */
+.narrador{
+  position:fixed;bottom:60px;left:50%;
+  transform:translateX(-50%);
+  z-index:830;pointer-events:none;
+  max-width:500px;width:90%;
+  animation:narrador-in 8s ease forwards;
+}
+@keyframes narrador-in{
+  0%{opacity:0;transform:translateX(-50%) translateY(30px) scale(.9)}
+  8%{opacity:1;transform:translateX(-50%) translateY(0) scale(1)}
+  85%{opacity:1;transform:translateX(-50%) translateY(0) scale(1)}
+  100%{opacity:0;transform:translateX(-50%) translateY(-10px) scale(.95)}
+}
+.narrador-inner{
+  background:linear-gradient(135deg,#1a1a1a,#0a0a0a);
+  border:2px solid var(--rose);
+  border-radius:14px;
+  padding:12px 18px;
+  display:flex;align-items:center;gap:12px;
+  box-shadow:0 4px 24px var(--rose-glow);
+}
+body.light .narrador-inner{
+  background:linear-gradient(135deg,#fff,#f5f5f5);
+  border-color:var(--rose);
+}
+.narrador-mic{font-size:28px;flex-shrink:0;animation:narrador-mic-pulse 1s ease infinite}
+@keyframes narrador-mic-pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.15) rotate(-5deg)}}
+.narrador-txt{
+  font-family:'Outfit',sans-serif;font-weight:800;
+  font-size:14px;color:var(--txt);line-height:1.4;
+}
+.narrador-txt strong{color:var(--rose-hi)}
+
 /* ── HELICOPTERO ONPE ── */
 .heli-wrap{
   position:fixed;top:8%;left:0;right:0;
@@ -453,7 +487,7 @@ body.light #ctxBox strong{color:var(--rose)}
   z-index:900;
   pointer-events:none;
   max-width:220px;
-  animation:bubble-float 6s ease-in-out forwards;
+  animation:bubble-float 10s ease-in-out forwards;
 }
 .chat-bubble .bubble-inner{
   background:var(--surface);
@@ -678,7 +712,7 @@ body.light #ctxBox strong{color:var(--rose)}
     <!-- Battle bar -->
     <div style="display:flex;height:clamp(42px,9vw,50px)">
       <div id="barS" class="bar-rose" style="display:flex;align-items:center;justify-content:center;color:#fff;font-family:'Outfit',sans-serif;font-weight:900;font-size:clamp(14px,3.2vw,17px);min-width:30px;transition:width 2s ease;width:50%">—%</div>
-      <div id="barL" class="bar-dark" style="display:flex;align-items:center;justify-content:center;color:var(--txt);font-family:'Outfit',sans-serif;font-weight:900;font-size:clamp(14px,3.2vw,17px);flex:1">—%</div>
+      <div id="barL" class="bar-dark" style="display:flex;align-items:center;justify-content:center;color:#fff;font-family:'Outfit',sans-serif;font-weight:900;font-size:clamp(14px,3.2vw,17px);flex:1">—%</div>
     </div>
   </div>
 
@@ -1357,7 +1391,7 @@ function showBubble(side){
   `;
 
   document.body.appendChild(bubble);
-  setTimeout(()=>bubble.remove(), 6200);
+  setTimeout(()=>bubble.remove(), 10500);
 }
 
 function scheduleBubble(){
@@ -1461,11 +1495,11 @@ function peloteaGallos(){
   arena.appendChild(galloR);
   document.body.appendChild(arena);
 
-  // Phase 1: Run toward each other (1.2s)
-  galloL.style.animation = 'gallo-run-left 1.2s ease-in forwards';
-  galloR.style.animation = 'gallo-run-right 1.2s ease-in forwards';
+  // Phase 1: Run toward each other (2.5s)
+  galloL.style.animation = 'gallo-run-left 2.5s ease-in forwards';
+  galloR.style.animation = 'gallo-run-right 2.5s ease-in forwards';
 
-  // Phase 2: Collision (at 1.2s)
+  // Phase 2: Collision (at 2.5s)
   setTimeout(()=>{
     // POW impact
     const pow = document.createElement('div');
@@ -1492,11 +1526,11 @@ function peloteaGallos(){
     }
 
     // Fight animation
-    galloL.style.animation = 'gallo-fight 1.5s ease';
-    galloR.style.animation = 'gallo-fight-r 1.5s ease';
-  }, 1200);
+    galloL.style.animation = 'gallo-fight 2.5s ease';
+    galloR.style.animation = 'gallo-fight-r 2.5s ease';
+  }, 2500);
 
-  // Phase 3: Winner! (at 3s)
+  // Phase 3: Winner! (at 5.5s)
   setTimeout(()=>{
     const sLead = burstLeader === 's';
 
@@ -1520,14 +1554,14 @@ function peloteaGallos(){
     kiki.style.cssText = 'position:absolute;top:70%;left:50%;transform:translate(-50%,-50%);font-family:Outfit,sans-serif;font-weight:900;font-size:14px;color:#fbbf24;text-shadow:0 1px 6px rgba(0,0,0,.5);white-space:nowrap;opacity:0;animation:gallo-pow 1.5s ease .6s forwards';
     kiki.textContent = sLead ? '🐕 GUAU GUAU GUAU!' : '🐷 OINK OINK OINK!';
     arena.appendChild(kiki);
-  }, 3000);
+  }, 5500);
 
   // Cleanup
   setTimeout(()=>{
     arena.style.transition = 'opacity .5s';
     arena.style.opacity = '0';
     setTimeout(()=>{arena.remove(); galloActive = false;}, 600);
-  }, 5000);
+  }, 8500);
 }
 
 // First at 12s, then every 35s
@@ -1608,6 +1642,53 @@ function launchHeli(){
 // First at 15s, then every 40s
 setTimeout(launchHeli, 15000);
 setInterval(launchHeli, 40000);
+
+/* ── NARRADOR DEPORTIVO ── */
+const NARRADOR_FRASES = [
+  "GOOOL DE VOTOS! Sanchez suma y sigue! La hinchada enloquece en las tribunas! 🏟️⚽",
+  "Atencion señores! Se estan procesando mas actas! Esto se pone CALIENTE! 🔥🔥🔥",
+  "QUE PARTIDO señores! Esto esta mas apretado que final de copa! ⚽😱",
+  "Lopez Aliaga busca el empate pero Sanchez no se deja! ESPECTACULAR! 🏆",
+  "ULTIMA HORA! Las actas siguen llegando! El estadio esta que explota! 💥🏟️",
+  "Señores esto es historico! Nunca se habia visto una diferencia tan pequeña! 📊😱",
+  "El VAR electoral esta revisando las actas! Tension MAXIMA! 📋🔍",
+  "Se acerca el final del partido electoral! Quedan pocas actas por contar! ⏰",
+  "La hinchada de Sanchez canta en las gradas! La de Lopez pide tiempo! 📢",
+  "ATENCION! Cambio tactico! Llegan actas de provincia! Esto puede cambiar TODO! 🌄📋",
+  "El arbitro ONPE sigue contando! No para señores! Que resistencia! 💪📊",
+  "Esto esta para infarto! Mi medico me dijo que no vea mas pero NO PUEDO! 💓😵",
+  "TIEMPO EXTRA! Las actas extras estan llegando! Nadie se vaya! 🚨⏰",
+  "El publico pide mas actas! QUEREMOS MAS! El conteo continua! 📢🗳️",
+  "Jugada magistral de ONPE! Contando actas a velocidad record! 🏃📋",
+  "PENAL? No! Es solo otra acta contabilizada! Sigamos señores! ⚽📊",
+  "La diferencia sube y baja como montaña rusa! Que emocion! 🎢😬",
+  "Esto ya no es eleccion, esto es THRILLER! Suspenso puro! 🎬😰",
+];
+
+let lastNarrador = -1;
+
+function showNarrador(){
+  document.querySelectorAll('.narrador').forEach(n=>n.remove());
+  let idx;
+  do { idx = Math.floor(Math.random()*NARRADOR_FRASES.length); }
+  while(idx === lastNarrador && NARRADOR_FRASES.length > 1);
+  lastNarrador = idx;
+
+  const el = document.createElement('div');
+  el.className = 'narrador';
+  el.innerHTML = `
+    <div class="narrador-inner">
+      <div class="narrador-mic">📻</div>
+      <div class="narrador-txt">${NARRADOR_FRASES[idx]}</div>
+    </div>
+  `;
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(), 8500);
+}
+
+// First at 10s, then every 20s
+setTimeout(showNarrador, 10000);
+setInterval(showNarrador, 20000);
 
 /* ── CONFETTI RAIN on leader ── */
 const CONFETTI_EMOJIS = ['🎉','🎊','✨','⭐','🌟','🔥','🇵🇪','💪','🏆','👑','🥇','💫','🎆','🎇'];
