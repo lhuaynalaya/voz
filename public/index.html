@@ -1386,11 +1386,11 @@ function peloteaGallos(){
 
   const galloL = document.createElement('div');
   galloL.className = 'gallo gallo-left';
-  galloL.textContent = '🐓';
+  galloL.textContent = '🐕';
 
   const galloR = document.createElement('div');
   galloR.className = 'gallo gallo-right';
-  galloR.textContent = '🐓';
+  galloR.textContent = '🐷';
 
   // Label under each rooster
   const labelL = document.createElement('div');
@@ -1458,13 +1458,13 @@ function peloteaGallos(){
     const winner = sLead ? 'SÁNCHEZ' : 'LÓPEZ A.';
     const result = document.createElement('div');
     result.className = 'gallo-result';
-    result.textContent = `🏆 ${winner} GANA! 🐓👑`;
+    result.textContent = `🏆 ${winner} GANA! 👑`;
     arena.appendChild(result);
 
     // Ki ki ri ki
     const kiki = document.createElement('div');
     kiki.style.cssText = 'position:absolute;top:70%;left:50%;transform:translate(-50%,-50%);font-family:Outfit,sans-serif;font-weight:900;font-size:14px;color:#fbbf24;text-shadow:0 1px 6px rgba(0,0,0,.5);white-space:nowrap;opacity:0;animation:gallo-pow 1.5s ease .6s forwards';
-    kiki.textContent = '🗣️ KI KI RI KIII!';
+    kiki.textContent = sLead ? '🐕 GUAU GUAU GUAU!' : '🐷 OINK OINK OINK!';
     arena.appendChild(kiki);
   }, 3000);
 
