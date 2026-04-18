@@ -1172,6 +1172,30 @@ const FRASES_S = [
   "Mejor me tomo un mate para los nervios 🍵",
   "Gracias Peru, no los voy a defraudar 🫡",
   "Esto se gana con el corazon, no con plata 💖",
+  "Alguien me pellizque, esto es real? 😲",
+  "Mi tia dice que ya sabia que iba a ganar 🧿",
+  "Subi mas rapido que el dolar 📈💵",
+  "Mis rivales me subestimaron 😏✊",
+  "Hasta mi gato esta contento 🐱🎉",
+  "Prometo no dormirme hasta el final 😴❌",
+  "Ya avise en el grupo de WhatsApp 📱🎉",
+  "El pueblo sabe, el pueblo decide 🗳️🇵🇪",
+  "Mas firme que poste de luz 🏗️💪",
+  "Me tiemblan las manos pero de emocion 🤲😅",
+  "Ya estoy pensando en mi primer decreto 📜",
+  "Mis compañeros ya estan brindando 🥂",
+  "Si fuera boxeo, ya gane por puntos 🥊📊",
+  "De cero a segundo lugar, nada mal 📈😌",
+  "Mi vecina me trajo tamales de celebracion 🫔🎉",
+  "Estoy sudando frio pero feliz 😰😁",
+  "Ya me hice tendencia en Twitter 📱🔥",
+  "Dicen que soy el candidato del pueblo 👨‍👩‍👧‍👦",
+  "Gracias a los madrugadores que votaron 🌅🗳️",
+  "Esto se siente como gol al ultimo minuto ⚽🔥",
+  "Ya le mande emoji de corazon a mi esposa ❤️📱",
+  "Mis hijos estan saltando de alegria 👧👦🎉",
+  "Si gano invito ceviche a todos 🐟🍋🎊",
+  "Mas contento que perro con dos colas 🐕🐕",
 ];
 
 const FRASES_L = [
@@ -1215,6 +1239,30 @@ const FRASES_L = [
   "Me dijeron que las actas de provincia me favorecen 🌄🤞",
   "Vamos que la noche es larga 🌙",
   "Si esto fuera maraton ya estaria llegando 🏃💨",
+  "Mi abuelita prendio otra velita mas 🕯️🕯️",
+  "Estoy contando las actas yo mismo 📋🔢",
+  "Que alguien me traiga una silla, me tiemblan las piernas 🪑😰",
+  "Todavia creo en los milagros ✨🙏",
+  "Estoy mas nervioso que en examen final 📝😵",
+  "Mi psicólogo me va a cobrar extra esta semana 🧠💸",
+  "Alguien tiene tilo? Necesito urgente 🌿😫",
+  "Voy a contar yo mismo las actas si es necesario 📊🔍",
+  "Mi mama me dijo que no me preocupe 🤱😌",
+  "Esto esta mas largo que cola del banco 🏦😩",
+  "Ya le prendi vela a todos los santos 🕯️🕯️🕯️",
+  "Si fuera carrera de caballos ya estaria remontando 🐎💨",
+  "Alguien me pasa un agua? Me esta dando calor 🥤😓",
+  "Dicen que la paciencia es una virtud 🧘⏳",
+  "Ya me termine las galletas de los nervios 🍪😬",
+  "Mi telefono no para de sonar con mensajes 📱📱📱",
+  "Respira, respira, todo va a estar bien 🌬️😤",
+  "Mis seguidores me estan mandando fuerza 💪📱",
+  "Esto es como ver pelicula de suspenso 🎬😱",
+  "Si pierdo al menos hice amigos en el camino 🤝😅",
+  "Alguien sabe a que hora termina el conteo? ⏰🤔",
+  "Mi corazon late mas rapido que el conteo 💓📊",
+  "Ya me cambie de camiseta 3 veces de los nervios 👕👕👕",
+  "Dicen que los ultimos votos son los mejores 🗳️🤞",
 ];
 
 let lastBubbleS = -1, lastBubbleL = -1;
@@ -1257,10 +1305,10 @@ function showBubble(side){
 function scheduleBubble(){
   const side = Math.random() > 0.5 ? 's' : 'l';
   showBubble(side);
-  const next = 5000 + Math.random() * 3000;
+  const next = 3000 + Math.random() * 2000;
   setTimeout(scheduleBubble, next);
 }
-setTimeout(scheduleBubble, 6000);
+setTimeout(scheduleBubble, 4000);
 
 /* ── VERSUS CLASH ANIMATION ── */
 const CLASH_TEXTS = ['💥 PELEA!','⚡ VERSUS!','🔥 CHOQUE!','💢 FIGHT!','👊 ROUND!','🥊 CLASH!'];
