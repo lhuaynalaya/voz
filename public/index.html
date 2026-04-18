@@ -229,44 +229,6 @@ body.light #ctxBox strong{color:var(--rose)}
   75%    {transform:translate(-50%,30px) scaleY(.9); opacity:.75}
   95%    {transform:translate(-50%,40px) scaleY(.3); opacity:0}
 }
-/* ── CHAT BUBBLES ── */
-.chat-bubble{
-  position:fixed;
-  z-index:900;
-  pointer-events:none;
-  max-width:220px;
-  animation:bubble-float 6s ease-in-out forwards;
-}
-.chat-bubble .bubble-inner{
-  background:var(--surface);
-  border:1px solid var(--border);
-  border-radius:16px 16px 16px 4px;
-  padding:10px 14px;
-  box-shadow:0 4px 20px rgba(0,0,0,.3);
-  position:relative;
-}
-.chat-bubble.right .bubble-inner{
-  border-radius:16px 16px 4px 16px;
-}
-.chat-bubble .bubble-name{
-  font-family:'Outfit',sans-serif;
-  font-weight:800;font-size:10px;
-  text-transform:uppercase;letter-spacing:.5px;
-  margin-bottom:3px;
-}
-.chat-bubble .bubble-name.rose{color:var(--rose-hi)}
-.chat-bubble .bubble-name.blue{color:#60a5fa}
-.chat-bubble .bubble-msg{
-  font-size:13px;font-weight:600;
-  color:var(--txt);line-height:1.4;
-}
-@keyframes bubble-float{
-  0%{opacity:0;transform:translateY(20px) scale(.8)}
-  8%{opacity:1;transform:translateY(0) scale(1)}
-  75%{opacity:1;transform:translateY(-30px) scale(1)}
-  100%{opacity:0;transform:translateY(-60px) scale(.9)}
-}
-
 /* ── UPDATE ALERT ── */
 .update-overlay{
   position:fixed;inset:0;z-index:8000;
@@ -483,6 +445,16 @@ body.light #ctxBox strong{color:var(--rose)}
     </div>
   </div>
 
+  <!-- RACHA -->
+  <div id="streakBox" class="surf" style="padding:12px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+    <span style="color:var(--txt3);font-size:12px">Esperando datos...</span>
+  </div>
+
+  <!-- PREDICCION -->
+  <div id="predictionBox" class="surf" style="padding:14px 18px">
+    <span style="color:var(--txt3);font-size:12px">Calculando prediccion...</span>
+  </div>
+
   <!-- FOOTER -->
   <div class="surf" style="padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap">
     <div style="display:flex;align-items:center;gap:8px">
@@ -689,6 +661,10 @@ function updateUI(data){
 
   // Show update alert (skip first load)
   if(prevData) showUpdateAlert(data, prevData);
+
+  // Racha + prediccion
+  updateStreak(sLead);
+  updatePrediction(data);
 
   prevData=data;resetCD();
 
@@ -953,89 +929,81 @@ function showCastillistaCloud(){
 setTimeout(showCastillistaCloud, 2500);
 setInterval(showCastillistaCloud, 11000);
 
-/* ── CHAT BUBBLES — frases graciosas ── */
-const FRASES_S = [
-  {msg:"El profe Castillo me enseño a ganar ✊😂", emoji:"😎"},
-  {msg:"2do lugar y subiendo 📈 tranquilos", emoji:"💪"},
-  {msg:"Lopez, te guardo sitio en el tren 🚂😂", emoji:"🤣"},
-  {msg:"Yo no necesito tren, camino nomas ✊", emoji:"🚶"},
-  {msg:"Gracias profe Castillo por tanto 🎓", emoji:"🙏"},
-  {msg:"De Juntos por el Peru al segundo lugar 🇵🇪", emoji:"🔥"},
-  {msg:"Alguien ha visto a Lopez? Se perdio 🔍", emoji:"😂"},
-  {msg:"Mi sombrero me da suerte 🎩", emoji:"🤠"},
-  {msg:"La gente ha hablado! Vamos arriba! 📢", emoji:"🗳️"},
-  {msg:"Oye Lopez, como se siente el 3er lugar? 😏", emoji:"💅"},
-  {msg:"Yo soy pueblo, no necesito avion privado ✊", emoji:"😤"},
-  {msg:"Castillista de corazon, siempre ❤️", emoji:"🫡"},
-  {msg:"No me voten a mi, votenle al profe... ah ya 😅", emoji:"😂"},
-  {msg:"Dicen que el tren no llego... como los votos de Lopez 🚂", emoji:"💀"},
-  {msg:"Segundo lugar sabe mejor con humildad 🙌", emoji:"😌"},
-];
+/* ── RACHA + PREDICCION ── */
+let streak = { leader: null, count: 0 };
+let voteHistory = []; // {sV, lV, pct} para calcular tendencia
 
-const FRASES_L = [
-  {msg:"Mi tren va a llegar... algun dia 🚂", emoji:"😤"},
-  {msg:"Exijo recuento! RECUENTO! 📋", emoji:"😡"},
-  {msg:"Yo no pierdo, hago casting para 3er lugar 🎭", emoji:"🎬"},
-  {msg:"Ya vengo, voy a buscar mis votos 🔍", emoji:"🏃"},
-  {msg:"Es culpa del comunismo 😤", emoji:"📢"},
-  {msg:"Cuando llegue mi tren van a ver... 🚂💨", emoji:"😠"},
-  {msg:"Fraude! Eso es lo que es! 🗣️", emoji:"🤬"},
-  {msg:"Yo tenia mas votos, lo juro 🤥", emoji:"🙄"},
-  {msg:"Voy a construir 10 trenes si gano 🚂🚂🚂", emoji:"🤡"},
-  {msg:"No me estan contando bien! 📊", emoji:"😵"},
-  {msg:"Sanchez quien? Nunca escuche de el 🙉", emoji:"💀"},
-  {msg:"A casa me voy... pero en tren 🚂😭", emoji:"😢"},
-  {msg:"Mi tren es mas rapido que el conteo de ONPE 🚄", emoji:"⏳"},
-  {msg:"Les dije que el tren era buena idea! Nadie me escucha 😤", emoji:"🗣️"},
-  {msg:"Voy a pedir asilo en el tren 🚂🏠", emoji:"😂"},
-];
+function updateStreak(sLead){
+  const who = sLead ? 's' : 'l';
+  if(streak.leader === who){
+    streak.count++;
+  } else {
+    streak.leader = who;
+    streak.count = 1;
+  }
+  renderStreak(sLead);
+}
 
-let lastBubbleS = -1, lastBubbleL = -1;
+function renderStreak(sLead){
+  const el = document.getElementById('streakBox');
+  if(!el) return;
+  const name = sLead ? 'Sánchez' : 'López Aliaga';
+  const fires = '🔥'.repeat(Math.min(streak.count, 15));
+  const size = Math.min(streak.count, 10);
+  const fireSize = 14 + size;
+  el.innerHTML = `
+    <span style="font-size:${fireSize}px;line-height:1">${fires}</span>
+    <span style="font-family:'Outfit',sans-serif;font-weight:900;font-size:14px;color:var(--txt)">${name} lleva <strong style="color:var(--rose-hi);font-size:18px">${streak.count}</strong> actualizaciones liderando</span>
+  `;
+  // Animate
+  el.classList.remove('flash');void el.offsetWidth;el.classList.add('flash');
+}
 
-function showBubble(side){
-  const frases = side === 's' ? FRASES_S : FRASES_L;
-  let idx;
-  do { idx = Math.floor(Math.random() * frases.length); }
-  while (idx === (side==='s' ? lastBubbleS : lastBubbleL) && frases.length > 1);
-  if(side==='s') lastBubbleS = idx; else lastBubbleL = idx;
+function updatePrediction(data){
+  const {actas, sanchez, lopez} = data;
+  const sV = sanchez.totalVotosValidos, lV = lopez.totalVotosValidos;
+  const pct = actas.porcentaje;
+  const remaining = 100 - pct;
 
-  const f = frases[idx];
-  const bubble = document.createElement('div');
-  bubble.className = 'chat-bubble' + (side==='l' ? ' right' : '');
+  voteHistory.push({sV, lV, pct, ts: Date.now()});
+  if(voteHistory.length > 20) voteHistory.shift();
 
-  // Position near the candidate
-  const ring = document.getElementById(side==='s' ? 'ringS' : 'ringL');
-  const rect = ring.getBoundingClientRect();
-  const top = rect.top + window.scrollY - 20 + Math.random()*40;
-  const left = side==='s'
-    ? Math.max(8, rect.left - 30 + Math.random()*20)
-    : Math.min(window.innerWidth - 230, rect.right - 190 + Math.random()*20);
+  const el = document.getElementById('predictionBox');
+  if(!el || voteHistory.length < 2) { if(el) el.innerHTML='<span style="color:var(--txt3);font-size:12px">Calculando prediccion...</span>'; return; }
 
-  bubble.style.top = top + 'px';
-  bubble.style.left = left + 'px';
+  // Calcular tendencia: diferencia por cada 1% de actas
+  const first = voteHistory[0], last = voteHistory[voteHistory.length-1];
+  const pctDelta = last.pct - first.pct;
+  if(pctDelta < 0.01) { el.innerHTML='<span style="color:var(--txt3);font-size:12px">Esperando mas datos...</span>'; return; }
 
-  const name = side==='s' ? 'Sánchez' : 'López Aliaga';
-  const nameClass = side==='s' ? 'rose' : 'blue';
+  const sDelta = last.sV - first.sV;
+  const lDelta = last.lV - first.lV;
+  const sRate = sDelta / pctDelta; // votos por 1% de actas
+  const lRate = lDelta / pctDelta;
 
-  bubble.innerHTML = `
-    <div class="bubble-inner">
-      <div class="bubble-name ${nameClass}">${f.emoji} ${name}</div>
-      <div class="bubble-msg">${f.msg}</div>
+  const sFinal = Math.round(sV + sRate * remaining);
+  const lFinal = Math.round(lV + lRate * remaining);
+  const diffFinal = Math.abs(sFinal - lFinal);
+  const winner = sFinal >= lFinal ? 'Sánchez' : 'López Aliaga';
+
+  const emoji = sFinal >= lFinal ? '📈' : '📉';
+  const confidence = pct > 95 ? 'Alta' : pct > 90 ? 'Media' : 'Baja';
+  const confColor = pct > 95 ? '#22c55e' : pct > 90 ? '#fbbf24' : '#f87171';
+
+  el.innerHTML = `
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+      <span style="font-size:20px">${emoji}</span>
+      <span style="font-family:'Outfit',sans-serif;font-weight:900;font-size:15px;color:var(--txt)">PREDICCIÓN AL 100%</span>
+      <span style="font-size:10px;font-weight:700;padding:3px 8px;border-radius:99px;background:${confColor}20;color:${confColor};border:1px solid ${confColor}40">Confianza: ${confidence}</span>
+    </div>
+    <div style="font-family:'Outfit',sans-serif;font-weight:900;font-size:clamp(18px,4.5vw,24px);color:var(--rose-hi);margin-bottom:4px">
+      ${winner} ganaría por ~${fmt(diffFinal)} votos
+    </div>
+    <div style="font-size:12px;color:var(--txt2);line-height:1.5">
+      Proyección: <strong style="color:var(--txt)">${fmt(sFinal)}</strong> vs <strong style="color:var(--txt)">${fmt(lFinal)}</strong> · Faltan ${remaining.toFixed(2)}% de actas
     </div>
   `;
-
-  document.body.appendChild(bubble);
-  setTimeout(()=>bubble.remove(), 6200);
 }
-
-// Alternar burbujas: una cada 5-7 segundos
-function scheduleBubble(){
-  const side = Math.random() > 0.5 ? 's' : 'l';
-  showBubble(side);
-  const next = 5000 + Math.random() * 3000;
-  setTimeout(scheduleBubble, next);
-}
-setTimeout(scheduleBubble, 6000);
 
 /* ── UPDATE ALERT (breaking news style) ── */
 function showUpdateAlert(data, prevD){
