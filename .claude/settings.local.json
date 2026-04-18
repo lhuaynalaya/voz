@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run *)",
+      "Bash(npm install *)",
+      "Bash(node *)",
+      "Bash(curl -s http://localhost:4301/api/data)",
+      "Bash(npm start *)",
+      "Bash(npx kill-port *)",
+      "Bash(file /c/Users/Yerson/Documents/FrontEnd/Otro/voz/public/img/*.jpg /c/Users/Yerson/Documents/FrontEnd/Otro/voz/public/img/*.gif)",
+      "Bash(identify /c/Users/Yerson/Documents/FrontEnd/Otro/voz/public/img/*)",
+      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(f'Actas: {d[\\\\\"actas\\\\\"][\\\\\"porcentaje\\\\\"]}% | Sanchez: {d[\\\\\"sanchez\\\\\"][\\\\\"totalVotosValidos\\\\\"]:,} | Lopez: {d[\\\\\"lopez\\\\\"][\\\\\"totalVotosValidos\\\\\"]:,}'\\)\")",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:4301/)",
+      "Bash(curl -s http://localhost:4301/api/status)"
+    ]
+  }
+}

@@ -1,544 +1,841 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Voto TV — Resultados en Vivo</title>
-    <meta name="description" content="Resultados electorales Peru 2026 en tiempo real. Quien pasa a segunda vuelta?">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg: #f4f5f7;
-            --white: #ffffff;
-            --text: #1d1d2b;
-            --text2: #6b7088;
-            --text3: #a0a4b8;
-            --border: #e4e6ee;
-            --red: #e8364e;
-            --red-light: #fef0f2;
-            --blue: #4361ee;
-            --blue-light: #eef1fe;
-            --orange: #ff8c21;
-            --green: #22c55e;
-            --shadow: 0 1px 3px rgba(0,0,0,.04), 0 4px 12px rgba(0,0,0,.03);
-            --shadow-lg: 0 2px 8px rgba(0,0,0,.05), 0 8px 24px rgba(0,0,0,.06);
-            --radius: 14px;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VotoTV — ¿Quién pasa a segunda vuelta? Perú 2026</title>
+<meta name="description" content="Resultados electorales Perú 2026 en tiempo real.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:ital,wght@0,400;0,600;0,700;0,800;0,900;1,900&family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+/* ── TOKENS ── */
+:root{
+  --rose:#9f1239;
+  --rose-hi:#be123c;
+  --rose-glow:rgba(159,18,57,.45);
+  --rose-soft:rgba(159,18,57,.12);
 
-        * { margin:0; padding:0; box-sizing:border-box }
+  --bg:#0a0a0a;
+  --surface:#141414;
+  --surface2:#1c1c1c;
+  --border:rgba(255,255,255,.07);
+  --divider:rgba(255,255,255,.05);
 
-        body {
-            font-family: 'DM Sans', system-ui, sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            min-height: 100vh;
-            padding: 0 16px 60px;
-        }
+  --txt:#f5f5f5;
+  --txt2:#a3a3a3;
+  --txt3:#525252;
+  --txt4:#2a2a2a;
 
-        /* Status bar */
-        .status-bar {
-            position: fixed; top: 0; left: 0; right: 0;
-            padding: 6px; text-align: center;
-            font-size: 11px; font-weight: 600;
-            z-index: 100; transition: all .4s;
-        }
-        .status-bar.ok { background: #ecfdf5; color: #16a34a; transform: translateY(-100%); }
-        .status-bar.loading { background: #fffbeb; color: #d97706; transform: translateY(0); }
-        .status-bar.error { background: #fef2f2; color: #dc2626; transform: translateY(0); }
+  --bar-track:rgba(255,255,255,.06);
+  --trail:rgba(255,255,255,.08);
+}
+body.light{
+  --bg:#fafafa;
+  --surface:#ffffff;
+  --surface2:#f5f5f5;
+  --border:rgba(0,0,0,.08);
+  --divider:rgba(0,0,0,.06);
+  --txt:#0a0a0a;
+  --txt2:#525252;
+  --txt3:#a3a3a3;
+  --txt4:#e5e5e5;
+  --bar-track:rgba(0,0,0,.07);
+  --trail:rgba(0,0,0,.1);
+}
 
-        /* Header */
-        .header {
-            max-width: 540px; margin: 0 auto;
-            padding: 32px 0 24px;
-            display: flex; flex-direction: column; align-items: center;
-        }
-        .logo {
-            font-family: 'Outfit', sans-serif;
-            font-size: clamp(32px, 8vw, 44px);
-            font-weight: 900;
-            letter-spacing: -1px;
-            margin-bottom: 2px;
-        }
-        .logo .voto { color: var(--text); }
-        .logo .tv {
-            background: linear-gradient(135deg, var(--red), var(--orange));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .live-pill {
-            display: inline-flex; align-items: center; gap: 6px;
-            background: var(--red); color: #fff;
-            font-size: 10px; font-weight: 700;
-            padding: 4px 12px; border-radius: 20px;
-            text-transform: uppercase; letter-spacing: 1px;
-            margin-bottom: 8px;
-        }
-        .live-pill .dot {
-            width: 6px; height: 6px;
-            background: #fff; border-radius: 50%;
-            animation: blink 1.4s infinite;
-        }
-        @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
-        .tagline { font-size: 14px; color: var(--text2); }
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:'DM Sans',system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased;
+  background:var(--bg);
+  color:var(--txt);
+  transition:background .25s,color .25s;
+}
 
-        .container { max-width: 540px; margin: 0 auto; }
+/* layout */
+#app{
+  max-width:580px;
+  margin:0 auto;
+  padding:0 16px;
+  min-height:100dvh;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  padding-top:14px;
+  padding-bottom:16px;
+}
 
-        /* Card base */
-        .card {
-            background: var(--white);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            margin-bottom: 14px;
-            overflow: hidden;
-        }
+/* cards */
+.surf{background:var(--surface);border:1px solid var(--border);border-radius:16px}
+.surf2{background:var(--surface2);border-radius:12px}
+.divider{border-top:1px solid var(--divider)}
 
-        /* Actas */
-        .actas { padding: 20px 24px; text-align: center; }
-        .actas-label { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: 1.5px; font-weight: 600; }
-        .actas-pct {
-            font-family: 'Outfit', sans-serif;
-            font-size: clamp(44px, 11vw, 62px);
-            font-weight: 900;
-            color: var(--text);
-            line-height: 1.1;
-        }
-        .actas-progress {
-            width: 100%; height: 6px;
-            background: var(--bg);
-            border-radius: 3px;
-            margin: 10px 0 6px;
-            overflow: hidden;
-        }
-        .actas-progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--red), var(--orange));
-            border-radius: 3px;
-            transition: width 1.5s ease;
-        }
-        .actas-sub { font-size: 12px; color: var(--text3); }
+/* theme btn */
+#themeBtn{
+  position:fixed;bottom:18px;right:16px;z-index:999;
+  width:40px;height:40px;border-radius:50%;
+  background:var(--surface);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  font-size:17px;cursor:pointer;
+  box-shadow:0 2px 12px rgba(0,0,0,.3);
+  transition:transform .18s;
+}
+#themeBtn:hover{transform:scale(1.1)}
 
-        /* Candidates */
-        .versus { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
-        .cand-card {
-            background: var(--white);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            padding: 20px 14px 18px;
-            text-align: center;
-            transition: all .3s;
-        }
-        .cand-card.lead-s { border-color: var(--red); box-shadow: var(--shadow-lg), 0 0 0 1px var(--red); }
-        .cand-card.lead-l { border-color: var(--blue); box-shadow: var(--shadow-lg), 0 0 0 1px var(--blue); }
+/* live dot */
+@keyframes pulse-live{0%,100%{opacity:1}50%{opacity:.3}}
+.dot-live{animation:pulse-live 1.2s ease infinite}
 
-        .cand-badge {
-            display: inline-block;
-            font-size: 9px; font-weight: 700;
-            padding: 3px 10px; border-radius: 20px;
-            text-transform: uppercase; letter-spacing: .5px;
-            margin-bottom: 14px;
-        }
-        .cand-card.lead-s .cand-badge { background: var(--red); color: #fff; }
-        .cand-card.lead-l .cand-badge { background: var(--blue); color: #fff; }
-        .cand-card:not(.lead-s):not(.lead-l) .cand-badge { background: var(--bg); color: var(--text3); }
+/* float */
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+.floating img{animation:float 3s ease-in-out infinite}
 
-        .cand-avatar {
-            width: clamp(60px, 16vw, 80px);
-            height: clamp(60px, 16vw, 80px);
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-family: 'Outfit', sans-serif;
-            font-size: clamp(20px, 5vw, 28px);
-            font-weight: 800; color: #fff;
-            margin: 0 auto 12px;
-        }
-        .cand-s .cand-avatar { background: linear-gradient(140deg, #ff6b6b, var(--red)); }
-        .cand-l .cand-avatar { background: linear-gradient(140deg, #748ffc, var(--blue)); }
-        .cand-card.lead-s .cand-avatar, .cand-card.lead-l .cand-avatar { animation: float 2.5s ease-in-out infinite; }
-        @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-4px)} }
+/* rings */
+.ring-rose{box-shadow:0 0 0 2.5px var(--rose),0 0 0 6px rgba(159,18,57,.15),0 6px 28px var(--rose-glow)}
+.ring-dim{box-shadow:0 0 0 2px var(--trail);filter:brightness(.5) saturate(.3)}
+.ring-dim img{filter:none}
 
-        .cand-name { font-family: 'Outfit', sans-serif; font-size: clamp(16px, 4.2vw, 20px); font-weight: 700; line-height: 1.2; margin-bottom: 2px; }
-        .cand-party { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: .5px; font-weight: 600; margin-bottom: 16px; }
-        .cand-votes {
-            font-family: 'Outfit', sans-serif;
-            font-size: clamp(22px, 6vw, 32px);
-            font-weight: 800;
-            margin-bottom: 2px;
-        }
-        .cand-card.lead-s .cand-votes { color: var(--red); }
-        .cand-card.lead-l .cand-votes { color: var(--blue); }
-        .cand-pct { font-size: clamp(14px, 3.5vw, 17px); color: var(--text2); font-weight: 600; }
+/* badges */
+.badge-rose{background:var(--rose);color:#fff}
+.badge-dim{background:var(--surface2);color:var(--txt3)}
 
-        /* Bar */
-        .bar-section { padding: 16px 20px; }
-        .bar-labels {
-            display: flex; justify-content: space-between;
-            font-size: 11px; font-weight: 700;
-            margin-bottom: 8px; text-transform: uppercase; letter-spacing: .5px;
-        }
-        .bar-labels .s { color: var(--red); }
-        .bar-labels .l { color: var(--blue); }
-        .bar-track {
-            width: 100%; height: clamp(36px, 8vw, 46px);
-            background: var(--bg);
-            border-radius: 10px;
-            overflow: hidden; display: flex; gap: 2px;
-        }
-        .bar-fill-s {
-            background: linear-gradient(90deg, var(--red), #ff6b6b);
-            height: 100%;
-            display: flex; align-items: center; justify-content: center;
-            color: #fff; font-weight: 700;
-            font-size: clamp(11px, 2.5vw, 14px);
-            transition: width 1.5s ease;
-            border-radius: 10px 0 0 10px;
-        }
-        .bar-fill-l {
-            background: linear-gradient(90deg, #748ffc, var(--blue));
-            height: 100%;
-            display: flex; align-items: center; justify-content: center;
-            color: #fff; font-weight: 700;
-            font-size: clamp(11px, 2.5vw, 14px);
-            transition: width 1.5s ease;
-            border-radius: 0 10px 10px 0;
-        }
+/* bar */
+.bar-rose{background:var(--rose)}
+.bar-dark{background:var(--surface2)}
+body.light .bar-dark{background:#262626}
 
-        /* Diff */
-        .diff-section { padding: 22px 20px; text-align: center; }
-        .diff-num {
-            font-family: 'Outfit', sans-serif;
-            font-size: clamp(38px, 10vw, 58px);
-            font-weight: 900;
-            color: var(--orange);
-            line-height: 1;
-        }
-        .diff-label { font-size: 12px; color: var(--text3); margin-top: 4px; }
+/* trend */
+.trend-up{background:rgba(22,163,74,.1);color:#16a34a;border-color:rgba(22,163,74,.25)}
+.trend-dn{background:var(--rose-soft);color:var(--rose-hi);border-color:rgba(159,18,57,.25)}
+.trend-eq{background:var(--surface2);color:var(--txt3);border-color:var(--border)}
 
-        /* Info */
-        .info { padding: 14px 18px; font-size: 13px; color: var(--text2); text-align: center; line-height: 1.5; }
-        .info strong { color: var(--orange); }
+/* flash */
+@keyframes flash{0%,100%{opacity:1}50%{opacity:.7}}
+.flash{animation:flash .5s ease}
 
-        /* Ticker */
-        .ticker {
-            padding: 10px 0; overflow: hidden;
-            border-top: 1px solid var(--border);
-        }
-        .ticker-scroll {
-            display: inline-flex; gap: 80px;
-            white-space: nowrap;
-            animation: marquee 22s linear infinite;
-        }
-        .ticker-scroll span { font-size: 13px; color: var(--text2); font-weight: 500; }
-        .ticker-scroll strong { color: var(--red); }
-        @keyframes marquee { 0%{transform:translateX(100%)} 100%{transform:translateX(-100%)} }
+/* celebrate */
+@keyframes celebrate{0%,100%{transform:scale(1)}40%{transform:scale(1.04) rotate(-2deg)}70%{transform:scale(1.04) rotate(2deg)}}
+.won{animation:celebrate .6s ease}
 
-        /* History */
-        .history-header {
-            padding: 14px 18px 0;
-            font-size: 11px; color: var(--text3);
-            text-transform: uppercase; letter-spacing: 1.5px; font-weight: 600;
-        }
-        .history-list {
-            list-style: none; padding: 8px 12px 12px;
-            max-height: 200px; overflow-y: auto;
-        }
-        .history-list::-webkit-scrollbar { width: 3px; }
-        .history-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
-        .history-list li {
-            padding: 7px 8px;
-            font-size: 12px; color: var(--text2);
-            border-bottom: 1px solid var(--bg);
-            display: flex; justify-content: space-between; align-items: center;
-        }
-        .history-list li:last-child { border-bottom: none; }
-        .history-list .time { color: var(--text3); font-size: 10px; }
-        .history-list .change-up { color: var(--green); font-weight: 600; }
-        .history-list .change-down { color: var(--red); font-weight: 600; }
+/* progress */
+@keyframes prog-shine{0%{background-position:200% center}100%{background-position:-200% center}}
+#progFill{
+  background:linear-gradient(90deg,var(--rose),var(--rose-hi),#e11d48,var(--rose));
+  background-size:300% 100%;
+  animation:prog-shine 3s linear infinite;
+  box-shadow:0 0 10px var(--rose-glow);
+}
 
-        /* Footer */
-        .foot {
-            text-align: center; padding: 16px 0;
-            font-size: 11px; color: var(--text3);
-        }
-        .foot a { color: var(--text2); text-decoration: none; }
-        .foot-countdown { font-size: 10px; color: var(--text3); margin-top: 4px; }
-    </style>
+/* countdown ring */
+#cdRing circle:first-child{stroke:var(--bar-track)}
+
+/* ctx strong */
+#ctxBox strong{color:var(--rose-hi);font-weight:700}
+body.light #ctxBox strong{color:var(--rose)}
+
+@keyframes celebrate{0%,100%{transform:scale(1)}25%{transform:scale(1.05) rotate(-2.5deg)}50%{transform:scale(1.05) rotate(2.5deg)}75%{transform:scale(1.02)}}
+
+/* ── STAR BURST ── */
+.star-particle{
+  position:absolute;
+  top:50%;left:50%;
+  pointer-events:none;
+  z-index:30;
+  animation:star-fly var(--dur,.9s) var(--ease,cubic-bezier(.15,.5,.5,1)) forwards;
+  animation-delay:var(--delay,0s);
+  opacity:0;
+}
+@keyframes star-fly{
+  0%  {transform:translate(-50%,-50%) scale(0) rotate(0deg);opacity:1}
+  25% {opacity:1;transform:translate(calc(-50% + var(--tx)*.4),calc(-50% + var(--ty)*.4)) scale(1.4) rotate(calc(var(--rot)*.3))}
+  70% {opacity:1}
+  100%{transform:translate(calc(-50% + var(--tx)),calc(-50% + var(--ty))) scale(.7) rotate(var(--rot));opacity:0}
+}
+/* second wave: bigger slower arc */
+@keyframes star-arc{
+  0%  {transform:translate(-50%,-50%) scale(0);opacity:1}
+  30% {opacity:1;transform:translate(calc(-50% + var(--tx)*.5),calc(-50% + var(--ty)*.5)) scale(1.8)}
+  100%{transform:translate(calc(-50% + var(--tx)),calc(-50% + var(--ty))) scale(.5);opacity:0}
+}
+.star-arc{animation-name:star-arc!important}
+
+/* ring bounce on burst */
+.ring-bounce{animation:ring-boing .5s cubic-bezier(.36,.07,.19,.97) both!important}
+@keyframes ring-boing{
+  0%{transform:scale(1)}20%{transform:scale(1.18) rotate(-6deg)}40%{transform:scale(.9) rotate(5deg)}60%{transform:scale(1.1) rotate(-3deg)}80%{transform:scale(.97) rotate(1deg)}100%{transform:scale(1) rotate(0deg)}
+}
+/* wobble on leader ring img */
+.ring-wobble img{animation:wobble 2s ease-in-out infinite!important}
+@keyframes wobble{
+  0%,100%{transform:rotate(0deg) scale(1)}
+  15%{transform:rotate(-5deg) scale(1.06)}
+  35%{transform:rotate(5deg) scale(1.06)}
+  55%{transform:rotate(-3deg) scale(1.03)}
+  75%{transform:rotate(3deg) scale(1.03)}
+}
+
+/* ── TRAIN GOODBYE — López ── */
+@keyframes train-bubble-pop{
+  0%  {transform:translateY(18px) scale(.25) rotate(4deg); opacity:0}
+  16% {transform:translateY(-5px)  scale(1.1)  rotate(-2deg);opacity:1}
+  28% {transform:translateY(0)    scale(1)    rotate(0);    opacity:1}
+  75% {transform:translateY(-6px)  scale(1.01) rotate(-.5deg);opacity:1}
+  92% {transform:translateY(-14px) scale(.88)  rotate(1deg); opacity:.7}
+  100%{transform:translateY(-22px) scale(.55)  rotate(0);    opacity:0}
+}
+@keyframes train-chug{
+  0%  {transform:translateX(-35px) scaleX(-1);opacity:0}
+  12% {opacity:1}
+  100%{transform:translateX(130px) scaleX(-1);opacity:.2}
+}
+
+/* ── CASTILLISTA CLOUD — Sánchez ── */
+@keyframes cloud-rise{
+  0%  {transform:translateX(-50%) translateY(22px) scale(.25) rotate(-6deg);opacity:0}
+  18% {transform:translateX(-50%) translateY(-6px)  scale(1.1)  rotate(3deg); opacity:1}
+  32% {transform:translateX(-50%) translateY(0px)   scale(1)    rotate(0deg); opacity:1}
+  72% {transform:translateX(-50%) translateY(-10px) scale(1.02) rotate(-1deg);opacity:1}
+  90% {transform:translateX(-50%) translateY(-16px) scale(.93)  rotate(1deg); opacity:.8}
+  100%{transform:translateX(-50%) translateY(-26px) scale(.65)  rotate(0deg); opacity:0}
+}
+@keyframes cloud-bob{
+  0%,100%{transform:translateY(0)   rotate(-1.5deg) scale(1)}
+  50%    {transform:translateY(-7px) rotate(1.5deg)  scale(1.03)}
+}
+@keyframes happy-spin{
+  0%  {transform:rotate(0deg)  scale(0);opacity:0}
+  20% {transform:rotate(-15deg) scale(1.2);opacity:1}
+  80% {transform:rotate(8deg)  scale(1);  opacity:1}
+  100%{transform:rotate(0deg)  scale(.5); opacity:0}
+}
+
+/* ── HAMMER ATTACK — López 3er lugar ── */
+@keyframes photo-bonk{
+  0%  {transform:translateY(0)   rotate(0deg)  scale(1)}
+  10% {transform:translateY(-18px) rotate(-12deg) scale(0.85)}
+  22% {transform:translateY(14px)  rotate(9deg)  scale(1.12)}
+  34% {transform:translateY(-10px) rotate(-6deg) scale(0.94)}
+  46% {transform:translateY(7px)   rotate(4deg)  scale(1.04)}
+  60% {transform:translateY(-4px)  rotate(-2deg)}
+  75% {transform:translateY(2px)}
+  100%{transform:translateY(0)   rotate(0deg)  scale(1)}
+}
+@keyframes tear-drip-anim{
+  0%,100%{transform:translate(-50%,-3px) scaleY(.4);opacity:0}
+  14%    {transform:translate(-50%, 0px) scaleY(1);  opacity:1}
+  75%    {transform:translate(-50%,30px) scaleY(.9); opacity:.75}
+  95%    {transform:translate(-50%,40px) scaleY(.3); opacity:0}
+}
+@keyframes impact-pop{
+  0%  {transform:translate(-50%,-50%) scale(0) rotate(-14deg);opacity:1}
+  30% {transform:translate(-50%,-50%) scale(1.3) rotate(6deg); opacity:1}
+  65% {transform:translate(-50%,-50%) scale(1.05) rotate(-2deg);opacity:.9}
+  100%{transform:translate(-50%,-50%) scale(.6) rotate(0deg);  opacity:0}
+}
+</style>
 </head>
 <body>
 
-    <div class="status-bar loading" id="statusBar">Cargando datos...</div>
+<!-- SPLASH -->
+<div id="splash" style="position:fixed;inset:0;z-index:9000;background:#0a0a0a;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .45s,transform .45s">
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:28px">
+    <div style="width:48px;height:48px;border-radius:14px;background:var(--rose);box-shadow:0 6px 28px var(--rose-glow);display:flex;align-items:center;justify-content:center">
+      <svg style="width:20px;height:20px;fill:white" viewBox="0 0 24 24"><path d="M6 4.75a1 1 0 0 1 1.514-.857l12 7.25a1 1 0 0 1 0 1.714l-12 7.25A1 1 0 0 1 6 19.25V4.75Z"/></svg>
+    </div>
+    <div style="font-family:'Outfit',sans-serif;font-weight:900;font-size:32px;letter-spacing:-0.07em;color:#f5f5f5">VOTO<span style="color:var(--rose);font-style:italic">TV</span></div>
+  </div>
+  <div style="width:160px;height:2px;background:rgba(255,255,255,.07);border-radius:99px;overflow:hidden;margin-bottom:14px">
+    <div style="height:100%;width:0%;background:var(--rose);border-radius:99px;animation:sfill 1.6s cubic-bezier(.4,0,.2,1) forwards;box-shadow:0 0 8px var(--rose-glow)"></div>
+  </div>
+  <p style="font-size:10px;font-weight:700;color:#525252;letter-spacing:2px;text-transform:uppercase">Cargando ONPE...</p>
+</div>
+<style>@keyframes sfill{0%{width:0}60%{width:72%}100%{width:100%}}</style>
 
-    <div class="header">
-        <div class="live-pill"><span class="dot"></span> En vivo</div>
-        <div class="logo"><span class="voto">Voto</span><span class="tv">TV</span></div>
-        <div class="tagline">Peru 2026 &middot; La pelea por el 2do lugar</div>
+<!-- STATUS -->
+<div id="statusBar" style="position:fixed;top:0;left:0;right:0;z-index:500;text-align:center;padding:6px 12px;font-size:11px;font-weight:700;letter-spacing:1px;transform:translateY(-100%);transition:transform .25s;backdrop-filter:blur(8px)">—</div>
+
+<!-- TOASTS -->
+<div id="toastWrap" style="position:fixed;top:14px;right:14px;z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none"></div>
+
+<!-- THEME -->
+<button id="themeBtn" onclick="toggleTheme()" title="Tema">🌙</button>
+
+<div id="app">
+
+  <!-- HEADER -->
+  <header style="display:flex;align-items:center;justify-content:space-between;padding:0 2px">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div style="width:40px;height:40px;border-radius:12px;background:var(--rose);box-shadow:0 4px 16px var(--rose-glow);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+        <svg style="width:18px;height:18px;fill:white" viewBox="0 0 24 24"><path d="M6 4.75a1 1 0 0 1 1.514-.857l12 7.25a1 1 0 0 1 0 1.714l-12 7.25A1 1 0 0 1 6 19.25V4.75Z"/></svg>
+      </div>
+      <div>
+        <div style="font-family:'Outfit',sans-serif;font-weight:900;font-size:28px;letter-spacing:-0.07em;line-height:1;color:var(--txt)">VOTO<span style="color:var(--rose);font-style:italic">TV</span></div>
+        <div style="font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--txt2);margin-top:2px">Elecciones Perú 2026</div>
+      </div>
+    </div>
+    <!-- live pill -->
+    <div style="display:flex;align-items:center;gap:7px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:8px 14px;font-size:11px;font-weight:700;letter-spacing:.5px;color:var(--txt)">
+      <span class="dot-live" style="width:8px;height:8px;border-radius:50%;background:#22c55e;flex-shrink:0;display:inline-block"></span>
+      EN VIVO &nbsp;<span id="liveClock" style="color:#22c55e;font-family:'Outfit',sans-serif;font-size:13px;font-weight:900">--:--</span>
+    </div>
+  </header>
+
+  <!-- ACTAS -->
+  <div id="actasCard" style="padding:0 2px">
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:8px">
+      <div>
+        <div style="font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--txt2);margin-bottom:3px">Actas contabilizadas · ONPE</div>
+        <div id="actasPct" style="font-family:'Outfit',sans-serif;font-weight:900;font-size:clamp(42px,10vw,58px);letter-spacing:-0.07em;line-height:1;color:var(--txt)">—<span style="font-size:.45em;color:var(--txt2)">%</span></div>
+      </div>
+      <div style="text-align:right;padding-bottom:4px">
+        <div style="font-size:15px;font-weight:600;color:var(--txt);margin-bottom:3px"><strong id="actasCont">—</strong> / <strong id="actasTotal">—</strong></div>
+        <div style="font-size:14px;color:var(--txt2)"><strong id="actasPend" style="color:var(--rose-hi);font-weight:800">—</strong> pendientes</div>
+      </div>
+    </div>
+    <div style="height:7px;border-radius:99px;overflow:hidden;background:var(--bar-track)">
+      <div id="progFill" style="height:100%;width:0%;border-radius:99px;transition:width 2s ease"></div>
+    </div>
+  </div>
+
+  <!-- BATTLE -->
+  <div id="battleArena" class="surf" style="position:relative;overflow:visible;padding:0">
+    <div style="position:absolute;top:0;left:0;right:0;height:2px;background:var(--rose);opacity:.8;border-radius:16px 16px 0 0"></div>
+
+    <div style="display:grid;grid-template-columns:1fr 40px 1fr;padding:14px 8px 12px">
+
+      <!-- Sánchez -->
+      <div id="fightS" style="display:flex;flex-direction:column;align-items:center;text-align:center;padding:0 6px">
+        <span id="fbadgeS" class="badge-rose" style="font-size:12px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;padding:5px 14px;border-radius:99px;margin-bottom:8px;display:inline-block">2do lugar</span>
+        <div id="ringS" class="floating ring-rose" style="width:clamp(96px,22vw,118px);height:clamp(96px,22vw,118px);border-radius:50%;margin-bottom:8px;transition:all .4s;flex-shrink:0;position:relative;overflow:visible">
+          <img src="/img/sanchez.jpg" alt="Sánchez" draggable="false" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block">
+        </div>
+        <div id="firesS" style="font-size:17px;min-height:22px;margin-bottom:5px;letter-spacing:3px">🔥🔥</div>
+        <div style="font-family:'Outfit',sans-serif;font-weight:900;font-size:clamp(16px,3.8vw,20px);line-height:1.2;color:var(--txt);margin-bottom:3px">Roberto<br>Sánchez</div>
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--txt2);margin-bottom:7px">Juntos por el Perú</div>
+        <div id="votosSanchez" style="font-family:'Outfit',sans-serif;font-weight:900;font-size:clamp(20px,5.2vw,28px);line-height:1;color:var(--rose-hi)">—</div>
+        <div id="pctSanchez" style="font-size:15px;font-weight:700;color:var(--txt);margin-top:3px">—</div>
+      </div>
+
+      <!-- VS -->
+      <div style="display:flex;align-items:center;justify-content:center;padding-top:clamp(46px,12vw,60px)">
+        <div style="width:36px;height:36px;border-radius:50%;background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:'Outfit',sans-serif;font-weight:900;font-size:12px;color:var(--txt2)">VS</div>
+      </div>
+
+      <!-- López -->
+      <div id="fightL" style="display:flex;flex-direction:column;align-items:center;text-align:center;padding:0 6px">
+        <span id="fbadgeL" class="badge-dim" style="font-size:12px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;padding:5px 14px;border-radius:99px;margin-bottom:8px;display:inline-block">3er lugar</span>
+        <div id="ringL" class="ring-dim" style="width:clamp(96px,22vw,118px);height:clamp(96px,22vw,118px);border-radius:50%;margin-bottom:8px;transition:all .4s;flex-shrink:0;position:relative;overflow:visible">
+          <img src="/img/lopezaliaga.jpg" alt="López Aliaga" draggable="false" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block">
+        </div>
+        <div id="firesL" style="font-size:17px;min-height:22px;margin-bottom:5px;letter-spacing:3px;opacity:.4">🔥🔥🔥🔥</div>
+        <div style="font-family:'Outfit',sans-serif;font-weight:900;font-size:clamp(16px,3.8vw,20px);line-height:1.2;color:var(--txt);margin-bottom:3px">Rafael<br>López Aliaga</div>
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--txt2);margin-bottom:7px">Renovación Popular</div>
+        <div id="votosLopez" style="font-family:'Outfit',sans-serif;font-weight:900;font-size:clamp(20px,5.2vw,28px);line-height:1;color:var(--txt)">—</div>
+        <div id="pctLopez" style="font-size:15px;font-weight:700;color:var(--txt);margin-top:3px">—</div>
+      </div>
+
     </div>
 
-    <div class="container">
-
-        <div class="card">
-            <div class="actas">
-                <div class="actas-label">Actas contabilizadas</div>
-                <div class="actas-pct" id="actasPct">&mdash;</div>
-                <div class="actas-progress"><div class="actas-progress-fill" id="actasBarFill" style="width:0%"></div></div>
-                <div class="actas-sub" id="actasDetail"></div>
-            </div>
-        </div>
-
-        <div class="versus">
-            <div class="cand-card cand-s lead-s" id="playerS">
-                <span class="cand-badge">2do lugar</span>
-                <div class="cand-avatar">RS</div>
-                <div class="cand-name">Roberto<br>Sanchez</div>
-                <div class="cand-party">Juntos por el Peru</div>
-                <div class="cand-votes" id="votosSanchez">&mdash;</div>
-                <div class="cand-pct" id="pctSanchez">&mdash;</div>
-            </div>
-            <div class="cand-card cand-l" id="playerL">
-                <span class="cand-badge">3er lugar</span>
-                <div class="cand-avatar">RLA</div>
-                <div class="cand-name">Rafael<br>Lopez Aliaga</div>
-                <div class="cand-party">Renovacion Popular</div>
-                <div class="cand-votes" id="votosLopez">&mdash;</div>
-                <div class="cand-pct" id="pctLopez">&mdash;</div>
-            </div>
-        </div>
-
-        <div class="card">
-            <div class="bar-section">
-                <div class="bar-labels">
-                    <span class="s">Sanchez</span>
-                    <span class="l">Lopez Aliaga</span>
-                </div>
-                <div class="bar-track">
-                    <div class="bar-fill-s" id="barS"></div>
-                    <div class="bar-fill-l" id="barL"></div>
-                </div>
-            </div>
-        </div>
-
-        <div class="card">
-            <div class="diff-section">
-                <div class="diff-num" id="diffVotos">&mdash;</div>
-                <div class="diff-label" id="diffLabel">votos de diferencia</div>
-            </div>
-        </div>
-
-        <div class="card">
-            <div class="info" id="contextBox">Cargando datos de ONPE...</div>
-        </div>
-        <div class="card">
-            <div class="info" id="pendingInfo"></div>
-        </div>
-
-        <div class="card">
-            <div class="ticker">
-                <div class="ticker-scroll">
-                    <span>Segunda vuelta: <strong>8 de junio de 2026</strong> &mdash; Keiko Fujimori asegurada en 1er lugar</span>
-                    <span>Segunda vuelta: <strong>8 de junio de 2026</strong> &mdash; Keiko Fujimori asegurada en 1er lugar</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="card">
-            <div class="history-header">Historial de cambios</div>
-            <ul class="history-list" id="historyList">
-                <li style="color:var(--text3);justify-content:center">Esperando datos...</li>
-            </ul>
-        </div>
-
-        <div class="foot">
-            <div id="timestamp">Esperando datos...</div>
-            <div class="foot-countdown" id="nextUpdate"></div>
-            <div style="margin-top:8px">
-                Fuente: <a href="https://resultadoelectoral.onpe.gob.pe/main/presidenciales" target="_blank">ONPE</a>
-            </div>
-        </div>
-
+    <!-- Battle bar -->
+    <div style="display:flex;height:clamp(42px,9vw,50px)">
+      <div id="barS" class="bar-rose" style="display:flex;align-items:center;justify-content:center;color:#fff;font-family:'Outfit',sans-serif;font-weight:900;font-size:clamp(14px,3.2vw,17px);min-width:30px;transition:width 2s ease;width:50%">—%</div>
+      <div id="barL" class="bar-dark" style="display:flex;align-items:center;justify-content:center;color:var(--txt);font-family:'Outfit',sans-serif;font-weight:900;font-size:clamp(14px,3.2vw,17px);flex:1">—%</div>
     </div>
+  </div>
+
+  <!-- DIFF -->
+  <div id="diffCard" class="surf" style="padding:16px 18px">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px">
+      <div>
+        <div id="diffVotos" style="font-family:'Outfit',sans-serif;font-weight:900;font-size:clamp(36px,9vw,52px);letter-spacing:-0.07em;line-height:1;color:var(--txt)">—</div>
+        <p id="diffLbl" style="font-size:15px;font-weight:600;color:var(--txt2);margin-top:4px">votos de ventaja</p>
+      </div>
+      <span id="diffTrend" class="trend-eq" style="display:inline-flex;align-items:center;gap:5px;font-size:13px;font-weight:700;padding:6px 12px;border-radius:99px;border:1px solid;flex-shrink:0;margin-top:3px">⏸ sin cambios</span>
+    </div>
+    <div class="divider" style="padding-top:12px">
+      <div style="display:flex;align-items:flex-start;gap:8px;font-size:14px;color:var(--txt);line-height:1.6;margin-bottom:12px">
+        <span style="flex-shrink:0;font-size:16px">🗳️</span>
+        <span id="ctxBox">Cargando...</span>
+      </div>
+      <div id="pendChips" style="display:flex;border-radius:10px;overflow:hidden;background:var(--surface2);border:1px solid var(--border)"></div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="surf" style="padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap">
+    <div style="display:flex;align-items:center;gap:8px">
+      <div style="position:relative;width:24px;height:24px;flex-shrink:0">
+        <svg id="cdRing" width="24" height="24" viewBox="0 0 28 28" style="position:absolute;inset:0;transform:rotate(-90deg)">
+          <circle cx="14" cy="14" r="10.5" fill="none" stroke="var(--bar-track)" stroke-width="3"/>
+          <circle id="cdFill" cx="14" cy="14" r="10.5" fill="none" stroke="var(--rose)" stroke-width="3" stroke-linecap="round" stroke-dasharray="65.97" stroke-dashoffset="0" style="transition:stroke-dashoffset 1s linear"/>
+        </svg>
+      </div>
+      <span id="nextUpdate" style="font-size:14px;font-weight:600;color:var(--txt)">Actualiza en <strong style="color:var(--rose-hi);font-weight:900">1:00</strong></span>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--txt2);flex-wrap:wrap">
+      <span id="timestamp">—</span>
+      <span style="color:var(--txt3)">·</span>
+      <span><strong id="onlineCount" style="color:#22c55e;font-size:14px">—</strong> en vivo</span>
+      <span style="color:var(--txt3)">·</span>
+      <span>Fuente: <a href="https://resultadoelectoral.onpe.gob.pe/main/presidenciales" target="_blank" rel="noopener" style="color:var(--rose-hi);font-weight:700;text-decoration:none">ONPE</a></span>
+    </div>
+  </div>
+
+</div><!-- /app -->
 
 <script>
-const DATA_URL = '/api/data';
-const FETCH_INTERVAL = 2 * 60 * 1000;
-const COUNTDOWN_FROM = 120;
+const DATA_URL='/api/data';
+const FETCH_MS=60*1000;
+const CD_SECS=60;
+const CD_CIRC=65.97;
 
-let prevData = null;
-let countdown = COUNTDOWN_FROM;
-let countdownTimer = null;
-let history = [];
+let prevData=null,countdown=CD_SECS,cdTimer=null,ws=null,wsLive=false;
 
-function fmt(n) {
-    if (n == null) return '\u2014';
-    const int = String(Math.floor(n));
-    let r = '', c = 0;
-    for (let i = int.length - 1; i >= 0; i--) {
-        if (c > 0 && c % 3 === 0) r = ',' + r;
-        r = int[i] + r;
-        c++;
-    }
-    if (int.length > 6) {
-        const p = r.indexOf(',');
-        r = r.substring(0, p) + "'" + r.substring(p + 1);
-    }
-    return r;
+// Theme
+(()=>{
+  const s=localStorage.getItem('vtv-theme');
+  if(s==='light')document.body.classList.add('light');
+  document.getElementById('themeBtn').textContent=s==='light'?'🌙':'☀️';
+})();
+function toggleTheme(){
+  const l=document.body.classList.toggle('light');
+  localStorage.setItem('vtv-theme',l?'light':'dark');
+  document.getElementById('themeBtn').textContent=l?'🌙':'☀️';
 }
 
-function animateNumber(el, target, duration) {
-    if (typeof target !== 'number') { el.textContent = target; return; }
-    const start = performance.now();
-    const base = Math.max(0, target - Math.floor(target * 0.02));
-    function tick(now) {
-        const t = Math.min((now - start) / duration, 1);
-        const ease = 1 - Math.pow(1 - t, 3);
-        el.textContent = fmt(Math.floor(base + (target - base) * ease));
-        if (t < 1) requestAnimationFrame(tick);
-        else el.textContent = fmt(target);
-    }
-    requestAnimationFrame(tick);
+function fmt(n){
+  if(n==null)return'—';
+  const s=String(Math.floor(n));let r='',c=0;
+  for(let i=s.length-1;i>=0;i--){if(c>0&&c%3===0)r=','+r;r=s[i]+r;c++}
+  if(s.length>6){const p=r.indexOf(',');r=r.slice(0,p)+"'"+r.slice(p+1)}
+  return r;
 }
 
-function animatePct(el, target, duration) {
-    const start = performance.now();
-    const base = Math.max(0, target - 0.5);
-    function tick(now) {
-        const t = Math.min((now - start) / duration, 1);
-        const ease = 1 - Math.pow(1 - t, 3);
-        el.textContent = (base + (target - base) * ease).toFixed(3) + '%';
-        if (t < 1) requestAnimationFrame(tick);
-        else el.textContent = target.toFixed(3) + '%';
-    }
-    requestAnimationFrame(tick);
+function animN(el,target,dur){
+  if(typeof target!=='number'){el.textContent=target;return}
+  const t0=performance.now(),base=Math.max(0,target-Math.floor(target*.02));
+  (function tick(now){const t=Math.min((now-t0)/dur,1),e=1-Math.pow(1-t,3);el.textContent=fmt(Math.floor(base+(target-base)*e));if(t<1)requestAnimationFrame(tick);else el.textContent=fmt(target)})(performance.now());
+}
+function animP(el,target,dur){
+  const t0=performance.now(),base=Math.max(0,target-.5);
+  (function tick(now){const t=Math.min((now-t0)/dur,1),e=1-Math.pow(1-t,3);el.textContent=(base+(target-base)*e).toFixed(3)+'%';if(t<1)requestAnimationFrame(tick);else el.textContent=target.toFixed(3)+'%'})(performance.now());
 }
 
-function setStatus(state, msg) {
-    const el = document.getElementById('statusBar');
-    el.className = 'status-bar ' + state;
-    el.textContent = msg;
-    if (state === 'ok') {
-        setTimeout(() => el.style.transform = 'translateY(-100%)', 2000);
-    }
+function setStatus(s,m){
+  const el=document.getElementById('statusBar');
+  el.textContent=m;
+  if(s==='loading'){el.style.cssText+='background:rgba(120,80,0,.9);color:#fbbf24;transform:translateY(0)'}
+  else if(s==='error'){el.style.cssText+='background:rgba(100,0,0,.9);color:#fca5a5;transform:translateY(0)'}
+  else{setTimeout(()=>el.style.transform='translateY(-100%)',1800);el.style.transform='translateY(0)'}
 }
 
-function updateUI(data) {
-    const { actas, sanchez, lopez } = data;
-    const sV = sanchez.totalVotosValidos;
-    const lV = lopez.totalVotosValidos;
-    const diff = Math.abs(sV - lV);
-    const sLead = sV >= lV;
-    const total = sV + lV;
-    const DUR = 2000;
-
-    if (prevData) {
-        const prevDiff = Math.abs(prevData.sanchez.totalVotosValidos - prevData.lopez.totalVotosValidos);
-        const diffChange = diff - prevDiff;
-        if (diffChange !== 0) {
-            addHistory(sLead ? 'Sanchez' : 'Lopez Aliaga', diff, diffChange);
-        }
-    }
-
-    animatePct(document.getElementById('actasPct'), actas.porcentaje, DUR);
-    document.getElementById('actasBarFill').style.width = actas.porcentaje + '%';
-    document.getElementById('actasDetail').textContent = fmt(actas.contabilizadas) + ' de ' + fmt(actas.total) + ' actas';
-
-    animateNumber(document.getElementById('votosSanchez'), sV, DUR);
-    animatePct(document.getElementById('pctSanchez'), sanchez.porcentajeVotosValidos, DUR);
-    animateNumber(document.getElementById('votosLopez'), lV, DUR);
-    animatePct(document.getElementById('pctLopez'), lopez.porcentajeVotosValidos, DUR);
-
-    const pS = document.getElementById('playerS');
-    const pL = document.getElementById('playerL');
-    pS.className = 'cand-card cand-s' + (sLead ? ' lead-s' : '');
-    pL.className = 'cand-card cand-l' + (sLead ? '' : ' lead-l');
-    pS.querySelector('.cand-badge').textContent = sLead ? '2do lugar' : '3er lugar';
-    pL.querySelector('.cand-badge').textContent = sLead ? '3er lugar' : '2do lugar';
-
-    if (prevData) {
-        const prevSLead = prevData.sanchez.totalVotosValidos >= prevData.lopez.totalVotosValidos;
-        if (prevSLead !== sLead) {
-            addHistory('CAMBIO DE POSICION', diff, 0);
-        }
-    }
-
-    document.getElementById('barS').style.width = (sV / total * 100) + '%';
-    document.getElementById('barS').textContent = sanchez.porcentajeVotosValidos.toFixed(3) + '%';
-    document.getElementById('barL').style.width = (lV / total * 100) + '%';
-    document.getElementById('barL').textContent = lopez.porcentajeVotosValidos.toFixed(3) + '%';
-
-    const diffEl = document.getElementById('diffVotos');
-    const diffStart = performance.now();
-    const diffBase = Math.max(0, diff - Math.floor(diff * 0.3));
-    (function tickDiff(now) {
-        const t = Math.min((now - diffStart) / DUR, 1);
-        const ease = 1 - Math.pow(1 - t, 3);
-        diffEl.textContent = '+' + fmt(Math.floor(diffBase + (diff - diffBase) * ease));
-        if (t < 1) requestAnimationFrame(tickDiff);
-        else diffEl.textContent = '+' + fmt(diff);
-    })(performance.now());
-
-    document.getElementById('diffLabel').textContent = 'votos de ventaja para ' + (sLead ? 'Sanchez' : 'Lopez Aliaga');
-
-    const pend = (actas.enviadasJee || 0) + (actas.pendientesJee || 0);
-    document.getElementById('pendingInfo').innerHTML = '<strong>' + fmt(pend) + '</strong> actas sin contabilizar (' + fmt(actas.enviadasJee || 0) + ' en JEE + ' + fmt(actas.pendientesJee || 0) + ' pendientes)';
-    document.getElementById('contextBox').innerHTML = 'Keiko Fujimori (1er lugar) ya asegurada. Solo <strong>' + fmt(diff) + ' votos</strong> separan el 2do del 3er lugar con <strong>' + fmt(pend) + ' actas</strong> por procesar.';
-
-    const ts = new Date(data.timestamp);
-    document.getElementById('timestamp').textContent = 'ONPE \u00B7 ' + ts.toLocaleDateString('es-PE', {timeZone:'America/Lima',day:'2-digit',month:'2-digit',year:'numeric'}) + ' ' + ts.toLocaleTimeString('es-PE', {timeZone:'America/Lima',hour:'2-digit',minute:'2-digit',hour12:true});
-
-    prevData = data;
-    resetCountdown();
+function toast(ico,msg,accent='',ms=3200){
+  const c=document.getElementById('toastWrap');
+  const el=document.createElement('div');
+  const bdr=accent==='green'?'#22c55e':accent==='blue'?'#60a5fa':'#9f1239';
+  el.style.cssText=`display:flex;align-items:center;gap:9px;background:var(--surface);color:var(--txt);border:1px solid var(--border);border-left:3px solid ${bdr};border-radius:10px;padding:10px 14px;font-size:12px;font-weight:600;box-shadow:0 4px 24px rgba(0,0,0,.4);transform:translateX(110%);pointer-events:auto;transition:transform .28s cubic-bezier(.34,1.56,.64,1);max-width:240px;font-family:'DM Sans',sans-serif`;
+  el.innerHTML=`<span style="font-size:15px;flex-shrink:0">${ico}</span><span>${msg}</span>`;
+  c.appendChild(el);
+  requestAnimationFrame(()=>el.style.transform='translateX(0)');
+  setTimeout(()=>{el.style.transform='translateX(110%)';setTimeout(()=>el.remove(),320)},ms);
 }
 
-function addHistory(leader, diff, change) {
-    const now = new Date();
-    const time = now.toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-    history.unshift({ time, leader, diff, change });
-    if (history.length > 50) history.pop();
-    renderHistory();
+function flash(id){
+  const el=document.getElementById(id);if(!el)return;
+  el.classList.remove('flash');void el.offsetWidth;el.classList.add('flash');
+  setTimeout(()=>el.classList.remove('flash'),600);
 }
 
-function renderHistory() {
-    const list = document.getElementById('historyList');
-    if (history.length === 0) return;
-    list.innerHTML = history.map(h => {
-        const cls = h.change > 0 ? 'change-up' : h.change < 0 ? 'change-down' : '';
-        const arrow = h.change > 0 ? '\u25B2' : h.change < 0 ? '\u25BC' : '\u26A1';
-        const sign = h.change > 0 ? '+' : '';
-        const detail = h.change !== 0 ? `(<span class="${cls}">${sign}${fmt(h.change)}</span>)` : '';
-        return `<li><span>${arrow} ${h.leader}: +${fmt(h.diff)} votos ${detail}</span><span class="time">${h.time}</span></li>`;
+function updateClock(){
+  document.getElementById('liveClock').textContent=
+    new Date().toLocaleTimeString('es-PE',{timeZone:'America/Lima',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:true});
+}
+updateClock();setInterval(updateClock,1000);
+
+function updateUI(data){
+  const{actas,sanchez,lopez}=data;
+  const sV=sanchez.totalVotosValidos,lV=lopez.totalVotosValidos;
+  const diff=Math.abs(sV-lV),sLead=sV>=lV,total=sV+lV;
+  const DUR=1600;
+  let dTrend='eq';
+
+  if(prevData){
+    const pd=Math.abs(prevData.sanchez.totalVotosValidos-prevData.lopez.totalVotosValidos);
+    const dc=diff-pd;
+    if(dc!==0){
+      flash('diffCard');
+      dTrend=dc>0?'dn':'up';
+      if(Math.abs(dc)>800)toast(dc>0?'📈':'📉',`Diferencia ${dc>0?'sube':'baja'}: ${fmt(Math.abs(dc))} votos`,dc>0?'':'green');
+    }
+    const pLead=prevData.sanchez.totalVotosValidos>=prevData.lopez.totalVotosValidos;
+    if(pLead!==sLead){
+      toast('🔄',`¡Cambio! ${sLead?'Sánchez':'López Aliaga'} toma el 2do lugar`,'blue',5000);
+      const w=document.getElementById(sLead?'fightS':'fightL');
+      w.classList.remove('won');void w.offsetWidth;w.classList.add('won');
+      setTimeout(()=>w.classList.remove('won'),700);
+    }
+  }
+
+  // Actas
+  const pct=actas.porcentaje;
+  document.getElementById('actasPct').innerHTML=pct.toFixed(3)+'<span style="font-size:.45em;color:var(--txt3)">%</span>';
+  document.getElementById('progFill').style.width=pct+'%';
+  document.getElementById('actasCont').textContent=fmt(actas.contabilizadas);
+  document.getElementById('actasTotal').textContent=fmt(actas.total);
+  document.getElementById('actasPend').textContent=fmt(actas.total-actas.contabilizadas);
+
+  // Votos
+  animN(document.getElementById('votosSanchez'),sV,DUR);
+  animP(document.getElementById('pctSanchez'),sanchez.porcentajeVotosValidos,DUR);
+  animN(document.getElementById('votosLopez'),lV,DUR);
+  animP(document.getElementById('pctLopez'),lopez.porcentajeVotosValidos,DUR);
+
+  // Rings & badges
+  const rS=document.getElementById('ringS'),rL=document.getElementById('ringL');
+  const bS=document.getElementById('fbadgeS'),bL=document.getElementById('fbadgeL');
+  const vS=document.getElementById('votosSanchez'),vL=document.getElementById('votosLopez');
+  const fS=document.getElementById('firesS'),fL=document.getElementById('firesL');
+
+  const ROSE='#be123c',MUTED='var(--txt2)';
+  if(sLead){
+    rS.className='floating ring-rose';rL.className='ring-dim';
+    bS.className='badge-rose';bS.style.cssText='font-size:9px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;padding:3px 10px;border-radius:99px;margin-bottom:8px;display:inline-block';bS.textContent='2do lugar';
+    bL.className='badge-dim';bL.style.cssText='font-size:9px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;padding:3px 10px;border-radius:99px;margin-bottom:8px;display:inline-block';bL.textContent='3er lugar';
+    vS.style.color=ROSE;vL.style.color=MUTED;
+    fS.style.opacity='1';fL.style.opacity='.35';
+    fS.textContent='🔥🔥';fL.textContent='🔥🔥🔥🔥';
+  }else{
+    rL.className='floating ring-rose';rS.className='ring-dim';
+    bL.className='badge-rose';bL.style.cssText='font-size:9px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;padding:3px 10px;border-radius:99px;margin-bottom:8px;display:inline-block';bL.textContent='2do lugar';
+    bS.className='badge-dim';bS.style.cssText='font-size:9px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;padding:3px 10px;border-radius:99px;margin-bottom:8px;display:inline-block';bS.textContent='3er lugar';
+    vL.style.color=ROSE;vS.style.color=MUTED;
+    fL.style.opacity='1';fS.style.opacity='.35';
+    fL.textContent='🔥🔥';fS.textContent='🔥🔥🔥🔥';
+  }
+
+  // Bar
+  const sp=sV/total*100;
+  const barS=document.getElementById('barS');
+  barS.style.width=sp+'%';
+  barS.textContent=sanchez.porcentajeVotosValidos.toFixed(2)+'%';
+  document.getElementById('barL').textContent=lopez.porcentajeVotosValidos.toFixed(2)+'%';
+
+  // Diff
+  const dEl=document.getElementById('diffVotos');
+  const t0=performance.now(),base=Math.max(0,diff-Math.floor(diff*.3));
+  (function tick(now){const t=Math.min((now-t0)/DUR,1),e=1-Math.pow(1-t,3);dEl.textContent='+'+fmt(Math.floor(base+(diff-base)*e));if(t<1)requestAnimationFrame(tick);else dEl.textContent='+'+fmt(diff)})(performance.now());
+  document.getElementById('diffLbl').textContent='votos de ventaja para '+(sLead?'Sánchez':'López Aliaga');
+
+  const dT=document.getElementById('diffTrend');
+  if(dTrend==='up'){dT.className='trend-up';dT.style.cssText='display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;padding:5px 10px;border-radius:99px;border:1px solid;flex-shrink:0;margin-top:3px';dT.textContent='▼ brecha baja'}
+  else if(dTrend==='dn'){dT.className='trend-dn';dT.style.cssText='display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;padding:5px 10px;border-radius:99px;border:1px solid;flex-shrink:0;margin-top:3px';dT.textContent='▲ brecha sube'}
+  else{dT.className='trend-eq';dT.style.cssText='display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;padding:5px 10px;border-radius:99px;border:1px solid;flex-shrink:0;margin-top:3px';dT.textContent='⏸ sin cambios'}
+
+  // Chips
+  const pend=(actas.enviadasJee||0)+(actas.pendientesJee||0);
+  document.getElementById('pendChips').innerHTML=
+    ['Pendientes','En JEE','Sin enviar'].map((lbl,i)=>{
+      const v=[pend,actas.enviadasJee||0,actas.pendientesJee||0][i];
+      return`<div style="flex:1;text-align:center;padding:8px 4px${i<2?';border-right:1px solid var(--border)':''}"><b style="display:block;font-family:'Outfit',sans-serif;font-weight:900;font-size:clamp(13px,3.2vw,17px);color:var(--txt);line-height:1;margin-bottom:2px">${fmt(v)}</b><small style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--txt3)">${lbl}</small></div>`;
     }).join('');
-}
 
-function resetCountdown() {
-    countdown = COUNTDOWN_FROM;
-    if (countdownTimer) clearInterval(countdownTimer);
-    countdownTimer = setInterval(() => {
-        countdown--;
-        if (countdown <= 0) countdown = 0;
-        document.getElementById('nextUpdate').textContent = 'Proxima actualizacion en ' + Math.floor(countdown/60) + ':' + String(countdown%60).padStart(2,'0');
-    }, 1000);
-}
+  document.getElementById('ctxBox').innerHTML=`Solo <strong>${fmt(diff)} votos</strong> separan el 2do del 3er lugar con <strong>${fmt(pend)} actas</strong> por procesar.`;
 
-async function fetchData() {
-    try {
-        setStatus('loading', 'Actualizando...');
-        const res = await fetch(DATA_URL);
-        if (!res.ok) throw new Error('HTTP ' + res.status);
-        const data = await res.json();
-        if (!data.ok) throw new Error('Datos no disponibles');
-        updateUI(data);
-        setStatus('ok', 'Datos actualizados');
-    } catch (err) {
-        console.error('Error:', err.message);
-        setStatus('error', 'Error al cargar datos - reintentando...');
+  // Timestamp
+  const ts=new Date(data.timestamp);
+  document.getElementById('timestamp').textContent='ONPE · '+
+    ts.toLocaleTimeString('es-PE',{timeZone:'America/Lima',hour:'2-digit',minute:'2-digit',hour12:true});
+
+  // Teardrop persistente en López cuando 3er
+  if(sLead){
+    if(!rL.querySelector('.tear-wrap')){
+      const wrap=document.createElement('div');
+      wrap.className='tear-wrap';
+      wrap.style.cssText='position:absolute;inset:0;pointer-events:none;z-index:29;border-radius:50%;overflow:visible;';
+      [{left:'28%',delay:'0s',dur:'2.0s'},{left:'44%',delay:'.55s',dur:'1.8s'},{left:'60%',delay:'1.1s',dur:'2.2s'},{left:'74%',delay:'.3s',dur:'2.6s'}].forEach(t=>{
+        const td=document.createElement('div');
+        td.style.cssText=`position:absolute;bottom:-6px;left:${t.left};width:14px;height:22px;background:linear-gradient(160deg,#bae6fd 15%,#0ea5e9 100%);border-radius:50% 50% 46% 46%/30% 30% 70% 70%;box-shadow:0 0 10px rgba(14,165,233,.85),0 0 20px rgba(56,189,248,.4),inset 0 2px 5px rgba(255,255,255,.45);animation:tear-drip-anim ${t.dur} ease-in-out ${t.delay} infinite;pointer-events:none;`;
+        wrap.appendChild(td);
+      });
+      rL.appendChild(wrap);
     }
+  } else {
+    rL.querySelectorAll('.tear-wrap,.crack-svg').forEach(e=>e.remove());
+  }
+
+  burstLeader = sLead ? 's' : 'l';
+  prevData=data;resetCD();
+
+  // Ocultar splash
+  const sp2=document.getElementById('splash');
+  if(sp2&&sp2.style.display!=='none'){
+    sp2.style.opacity='0';sp2.style.transform='scale(1.03)';
+    setTimeout(()=>sp2.style.display='none',480);
+  }
 }
 
-// Primera carga + polling cada 2 min
+function resetCD(){
+  countdown=CD_SECS;if(cdTimer)clearInterval(cdTimer);
+  cdTimer=setInterval(()=>{
+    countdown=Math.max(0,countdown-1);
+    const m=Math.floor(countdown/60),s=String(countdown%60).padStart(2,'0');
+    document.getElementById('nextUpdate').innerHTML=`Actualiza en <strong style="color:var(--txt);font-weight:800">${m}:${s}</strong>`;
+    const f=document.getElementById('cdFill');
+    f.style.strokeDashoffset=CD_CIRC*(1-countdown/CD_SECS);
+  },1000);
+}
+
+function setOnline(n){
+  const f=v=>v>999?(v/1000).toFixed(1)+'k':v;
+  document.getElementById('onlineCount').textContent=f(n);
+}
+
+function connectWS(){
+  const proto=location.protocol==='https:'?'wss':'ws';
+  try{ws=new WebSocket(`${proto}://${location.host}`)}catch{return}
+  ws.onopen=()=>wsLive=true;
+  ws.onmessage=e=>{try{const m=JSON.parse(e.data);if(m.type==='data'){updateUI(m.payload);setStatus('ok','✓');if(m.meta)setOnline(m.meta.online)}else if(m.type==='visitors')setOnline(m.payload.online)}catch{}};
+  ws.onclose=()=>{wsLive=false;setTimeout(connectWS,5000)};
+}
+
+async function fetchData(auto=false){
+  try{
+    if(auto){
+      // mini splash simulado
+      const sp=document.getElementById('splash');
+      const bar=sp.querySelector('div > div:last-child > div') || sp.querySelector('[style*="animation"]');
+      sp.style.opacity='1';sp.style.transform='scale(1)';sp.style.display='flex';
+      // reiniciar barra
+      const barEl=sp.querySelector('div[style*="sfill"]')||sp.querySelectorAll('div div div')[0];
+      if(barEl){barEl.style.animation='none';void barEl.offsetWidth;barEl.style.animation='sfill 0.9s cubic-bezier(.4,0,.2,1) forwards'}
+    }
+    setStatus('loading','Actualizando...');
+    const r=await fetch(DATA_URL);if(!r.ok)throw 0;
+    const d=await r.json();if(!d.ok)throw 0;
+    updateUI(d);if(d._meta)setOnline(d._meta.online);setStatus('ok','✓');
+  }catch{
+    // ocultar splash si quedó visible
+    const sp=document.getElementById('splash');
+    if(sp){{sp.style.opacity='0';setTimeout(()=>sp.style.display='none',480)}}
+    setStatus('error','⚠ Error — reintentando...');
+  }
+}
+
+connectWS();
 fetchData();
-setInterval(fetchData, FETCH_INTERVAL);
+setInterval(()=>fetchData(true),FETCH_MS);
+
+/* ── STAR BURST ANIMATION ── */
+const EMOJIS_S = ['⭐','🌟','💫','🔥','👑','🎉','🇵🇪','😂','🏆','🎊','✨','💪'];
+const EMOJIS_L = ['💥','🤣','😜','🎭','🃏','😂','🙈','🤡','👀','💩','🫠','😵'];
+let burstLeader = 's';
+
+function spawnParticle(ring, emojis, wave){
+  const p = document.createElement('span');
+  p.className = 'star-particle' + (wave===2?' star-arc':'');
+  const angle  = Math.random()*360;
+  const dist   = wave===1 ? (60+Math.random()*55) : (90+Math.random()*70);
+  const rad    = angle * Math.PI/180;
+  const tx     = Math.cos(rad)*dist;
+  const ty     = Math.sin(rad)*dist;
+  const rot    = (Math.random()-0.5)*520;
+  const dur    = wave===1 ? (0.55+Math.random()*0.4)+'s' : (0.8+Math.random()*0.5)+'s';
+  const delay  = wave===1 ? (Math.random()*0.12)+'s' : (0.08+Math.random()*0.18)+'s';
+  const size   = wave===1 ? (15+Math.random()*13) : (20+Math.random()*14);
+  p.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+  p.style.setProperty('--tx', tx+'px');
+  p.style.setProperty('--ty', ty+'px');
+  p.style.setProperty('--rot', rot+'deg');
+  p.style.setProperty('--dur', dur);
+  p.style.setProperty('--delay', delay);
+  p.style.fontSize = size+'px';
+  ring.appendChild(p);
+  setTimeout(()=>p.remove(), 1600);
+}
+
+function burst(side){
+  const id     = side==='s' ? 'ringS' : 'ringL';
+  const emojis = side==='s' ? EMOJIS_S : EMOJIS_L;
+  const ring   = document.getElementById(id);
+  if(!ring) return;
+
+  // bounce + wobble
+  ring.classList.remove('ring-bounce','ring-wobble');
+  void ring.offsetWidth;
+  ring.classList.add('ring-bounce');
+  setTimeout(()=>{ring.classList.remove('ring-bounce');ring.classList.add('ring-wobble')}, 520);
+  setTimeout(()=>ring.classList.remove('ring-wobble'), 2400);
+
+  // wave 1: 10 fast close particles
+  for(let i=0;i<10;i++) spawnParticle(ring, emojis, 1);
+  // wave 2: 6 big slow arc particles
+  setTimeout(()=>{ for(let i=0;i<6;i++) spawnParticle(ring, emojis, 2); }, 120);
+}
+
+// Auto-burst every 2 seconds on the leader
+setInterval(()=>burst(burstLeader), 2000);
+
+/* ── HAMMER ATTACK — López Aliaga 3er lugar ── */
+let hammerActive = false;
+
+function showHammerAttack(){
+  const ring = document.getElementById('ringL');
+  if(!ring || hammerActive) return;
+  const badge = document.getElementById('fbadgeL');
+  if(!badge || !badge.textContent.includes('3er')) return;
+  hammerActive = true;
+
+  ring.querySelectorAll('.hammer-el,.crack-svg,.impact-txt-h').forEach(e=>e.remove());
+
+  // Hammer emoji
+  const hammer = document.createElement('div');
+  hammer.className = 'hammer-el';
+  hammer.textContent = '🔨';
+  hammer.style.cssText = 'position:absolute;top:-24px;right:-14px;font-size:36px;z-index:50;pointer-events:none;transform-origin:bottom right;transform:rotate(-55deg) translate(6px,-10px);filter:drop-shadow(2px 3px 6px rgba(0,0,0,.8));';
+  ring.appendChild(hammer);
+
+  // Crack SVG overlay
+  const svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
+  svg.setAttribute('class','crack-svg');
+  svg.setAttribute('viewBox','0 0 100 100');
+  svg.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;border-radius:50%;pointer-events:none;z-index:27;';
+  const cracks = [
+    {d:'M 52 18 L 38 50 L 20 72', sw:2.2},
+    {d:'M 52 18 L 68 44 L 82 65', sw:1.8},
+    {d:'M 38 50 L 24 80',          sw:1.4},
+    {d:'M 68 44 L 72 82',          sw:1.1},
+  ];
+  svg.innerHTML = cracks.map(c=>`<path d="${c.d}" stroke="rgba(255,255,255,0.92)" stroke-width="${c.sw}" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0" class="crack-path" style="filter:drop-shadow(0 0 2px rgba(0,0,0,1))"/>`).join('');
+  ring.appendChild(svg);
+
+  const IMPACTS  = ['💥 ¡AY!', '😵 ¡CRACK!', '🤕 ¡BAS!', '😂 ¡A CASA!'];
+  const HIT_T    = [0, 500, 1060, 1680];
+  const paths    = svg.querySelectorAll('.crack-path');
+
+  HIT_T.forEach((delay, n) => {
+    setTimeout(()=>{
+      // swing DOWN fast
+      hammer.style.transition = 'transform 0.1s cubic-bezier(.9,0,1,.4)';
+      hammer.style.transform  = 'rotate(20deg) translate(-22px,16px) scale(1.45)';
+
+      setTimeout(()=>{
+        // IMPACT: shake photo
+        const img = ring.querySelector('img');
+        if(img){ img.style.animation='none'; void img.offsetWidth; img.style.animation=`photo-bonk ${0.38+n*0.07}s ease`; }
+
+        // reveal crack line
+        if(paths[n]){ paths[n].style.transition='opacity .07s'; paths[n].style.opacity='1'; }
+
+        // impact text
+        const txt = document.createElement('div');
+        txt.className = 'impact-txt-h';
+        txt.textContent = IMPACTS[n];
+        txt.style.cssText = `position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(0) rotate(-12deg);z-index:60;pointer-events:none;font-family:'Outfit',sans-serif;font-weight:900;font-size:${13+n*3}px;color:#fbbf24;text-shadow:0 0 10px rgba(0,0,0,1),2px 2px 0 rgba(0,0,0,.8);white-space:nowrap;transition:transform .13s cubic-bezier(.1,2.2,.4,1.1),opacity .2s;`;
+        ring.appendChild(txt);
+        void txt.offsetWidth;
+        txt.style.transform = 'translate(-50%,-50%) scale(1.2) rotate(5deg)';
+        setTimeout(()=>{ txt.style.transform='translate(-50%,-50%) scale(.6) rotate(0)'; txt.style.opacity='0'; setTimeout(()=>txt.remove(),220); }, 420);
+
+        // bounce back UP
+        setTimeout(()=>{
+          hammer.style.transition = 'transform 0.22s cubic-bezier(0,.9,.5,1.5)';
+          hammer.style.transform  = 'rotate(-70deg) translate(9px,-16px) scale(0.88)';
+          setTimeout(()=>{ hammer.style.transition='transform .15s ease'; hammer.style.transform='rotate(-55deg) translate(6px,-10px) scale(1)'; }, 180);
+        }, 110);
+
+      }, 120);
+    }, delay);
+  });
+
+  // Exit: fly hammer away → show train goodbye
+  setTimeout(()=>{
+    hammer.style.transition = 'transform .45s ease, opacity .45s ease';
+    hammer.style.opacity    = '0';
+    hammer.style.transform  = 'rotate(-95deg) translate(28px,-38px) scale(0.3)';
+    setTimeout(()=>{ hammer.remove(); hammerActive = false; showTrainGoodbye(); }, 480);
+  }, 2450);
+}
+
+function showTrainGoodbye(){
+  const ring = document.getElementById('ringL');
+  if(!ring) return;
+  ring.querySelectorAll('.train-bubble').forEach(e=>e.remove());
+
+  const bubble = document.createElement('div');
+  bubble.className = 'train-bubble';
+  bubble.style.cssText = 'position:absolute;top:-102px;left:-12px;z-index:55;pointer-events:none;animation:train-bubble-pop 5s ease-in-out forwards;';
+
+  bubble.innerHTML = `
+    <div style="position:relative;background:linear-gradient(135deg,#f8fafc 0%,#e2e8f0 100%);border-radius:16px;padding:10px 15px 12px;font-family:'Outfit',sans-serif;font-weight:900;box-shadow:0 6px 24px rgba(0,0,0,.28),0 0 0 2px rgba(148,163,184,.45);white-space:nowrap;max-width:148px;overflow:hidden;">
+      <div style="font-size:9px;font-weight:800;color:#94a3b8;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px">López dice:</div>
+      <div style="font-size:16px;line-height:1.4;color:#0f172a;font-weight:900;text-shadow:0 1px 2px rgba(0,0,0,.08)">¡Ya me voy<br>a casa... 😭😭</div>
+      <div style="font-size:14px;color:#be123c;margin-top:5px;font-weight:900;letter-spacing:-.2px;text-shadow:0 1px 2px rgba(0,0,0,.1)">¡como mi tren! 🚂</div>
+      <div style="position:relative;overflow:hidden;height:22px;margin-top:5px;border-radius:4px;background:rgba(0,0,0,.04)">
+        <span style="position:absolute;top:1px;left:0;font-size:20px;animation:train-chug 2.2s ease-in .5s forwards">🚂💨</span>
+      </div>
+      <div style="position:absolute;bottom:-11px;right:18px;width:0;height:0;border-left:9px solid transparent;border-right:9px solid transparent;border-top:11px solid #e2e8f0;"></div>
+    </div>`;
+
+  ring.appendChild(bubble);
+  setTimeout(()=>bubble.remove(), 5200);
+}
+
+// First attack 4s after load, then every 9s
+setTimeout(showHammerAttack, 4000);
+setInterval(showHammerAttack, 9000);
+
+/* ── CASTILLISTA CLOUD — Roberto Sánchez ── */
+function showCastillistaCloud(){
+  const ring = document.getElementById('ringS');
+  if(!ring) return;
+  ring.querySelectorAll('.castilla-cloud').forEach(e=>e.remove());
+
+  const cloud = document.createElement('div');
+  cloud.className = 'castilla-cloud';
+  cloud.style.cssText = 'position:absolute;top:-108px;left:50%;z-index:55;pointer-events:none;animation:cloud-rise 4.6s ease-in-out forwards;';
+
+  cloud.innerHTML = `
+    <div style="position:relative;display:inline-block">
+      <div style="position:absolute;top:-14px;left:10px;width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#fff 0%,#e0f7fa 100%);box-shadow:0 0 10px rgba(56,189,248,.35)"></div>
+      <div style="position:absolute;top:-22px;left:30px;width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#fff 0%,#e0f7fa 100%);box-shadow:0 0 12px rgba(56,189,248,.4)"></div>
+      <div style="position:absolute;top:-16px;left:62px;width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#fff 0%,#e0f7fa 100%);box-shadow:0 0 10px rgba(56,189,248,.35)"></div>
+      <div style="position:absolute;top:-10px;right:8px;width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,#fff 0%,#e0f7fa 100%);box-shadow:0 0 8px rgba(56,189,248,.3)"></div>
+      <div style="background:linear-gradient(135deg,#fff 0%,#e0f7fa 100%);border-radius:18px;padding:11px 18px 13px;font-family:'Outfit',sans-serif;font-weight:900;font-size:13px;color:#075985;box-shadow:0 6px 24px rgba(56,189,248,.5),0 0 0 2px rgba(147,197,253,.6);animation:cloud-bob 2.1s ease-in-out infinite;white-space:nowrap;text-align:center;">
+        <div style="font-size:18px;margin-bottom:4px">☁️😄☁️</div>
+        <div style="letter-spacing:.3px">¡Soy <span style="color:#be123c;font-size:15px">Castillista</span>!</div>
+        <div style="font-size:11px;font-weight:700;color:#0ea5e9;margin-top:4px;letter-spacing:.5px">✊ ¡VIVA EL PROFE! 🇵🇪🎉</div>
+      </div>
+      <div style="position:absolute;bottom:-16px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:3px">
+        <div style="width:9px;height:9px;border-radius:50%;background:#e0f2fe;box-shadow:0 0 5px rgba(56,189,248,.6)"></div>
+        <div style="width:6px;height:6px;border-radius:50%;background:#bae6fd;box-shadow:0 0 4px rgba(56,189,248,.5)"></div>
+        <div style="width:3px;height:3px;border-radius:50%;background:#7dd3fc"></div>
+      </div>
+    </div>`;
+
+  ring.appendChild(cloud);
+
+  // Mini estrellas felices al aparecer
+  const happyEmojis = ['🎉','⭐','✊','🇵🇪','😄','🌟','🎊','💪'];
+  for(let i=0;i<8;i++){
+    setTimeout(()=>{
+      const p=document.createElement('span');
+      const angle=Math.random()*360, dist=55+Math.random()*45, rad=angle*Math.PI/180;
+      p.style.cssText=`position:absolute;top:50%;left:50%;font-size:${13+Math.random()*10}px;pointer-events:none;z-index:56;opacity:0;animation:star-fly .9s ease forwards;--tx:${Math.cos(rad)*dist}px;--ty:${Math.sin(rad)*dist}px;--rot:${(Math.random()-.5)*400}deg;--dur:.9s;--delay:0s;`;
+      p.textContent=happyEmojis[Math.floor(Math.random()*happyEmojis.length)];
+      ring.appendChild(p);
+      setTimeout(()=>p.remove(),1000);
+    }, i*80);
+  }
+
+  setTimeout(()=>cloud.remove(), 5000);
+}
+
+setTimeout(showCastillistaCloud, 2500);
+setInterval(showCastillistaCloud, 11000);
+
 </script>
 </body>
 </html>
