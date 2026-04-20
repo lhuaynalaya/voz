@@ -17,32 +17,38 @@
   --rose-glow:rgba(159,18,57,.45);
   --rose-soft:rgba(159,18,57,.12);
 
-  --bg:#0a0a0a;
-  --surface:#141414;
-  --surface2:#1c1c1c;
-  --border:rgba(255,255,255,.07);
+  --bg:#070709;
+  --surface:rgba(18,18,22,.95);
+  --surface2:rgba(28,28,34,.8);
+  --border:rgba(255,255,255,.08);
   --divider:rgba(255,255,255,.05);
 
-  --txt:#f5f5f5;
-  --txt2:#a3a3a3;
-  --txt3:#525252;
-  --txt4:#2a2a2a;
+  --txt:#f5f5fa;
+  --txt2:#a8a8bc;
+  --txt3:#6a6a80;
+  --txt4:#202028;
 
   --bar-track:rgba(255,255,255,.06);
   --trail:rgba(255,255,255,.08);
+
+  --glass-blur:14px;
+  --card-shadow:0 4px 32px rgba(0,0,0,.5),0 1px 0 rgba(255,255,255,.04) inset;
+  --card-shadow-hi:0 8px 48px rgba(0,0,0,.6),0 1px 0 rgba(255,255,255,.06) inset;
 }
 body.light{
-  --bg:#fafafa;
-  --surface:#ffffff;
-  --surface2:#f5f5f5;
+  --bg:#f0f0f5;
+  --surface:rgba(255,255,255,.92);
+  --surface2:rgba(240,240,248,.7);
   --border:rgba(0,0,0,.08);
   --divider:rgba(0,0,0,.06);
-  --txt:#0a0a0a;
-  --txt2:#525252;
-  --txt3:#a3a3a3;
-  --txt4:#e5e5e5;
+  --txt:#0a0a14;
+  --txt2:#404055;
+  --txt3:#8a8a9e;
+  --txt4:#e5e5ee;
   --bar-track:rgba(0,0,0,.07);
   --trail:rgba(0,0,0,.1);
+  --card-shadow:0 4px 24px rgba(0,0,0,.08),0 1px 0 rgba(255,255,255,.9) inset;
+  --card-shadow-hi:0 8px 40px rgba(0,0,0,.12),0 1px 0 rgba(255,255,255,.95) inset;
 }
 
 *{box-sizing:border-box;margin:0;padding:0}
@@ -50,9 +56,22 @@ html,body{height:100%}
 body{
   font-family:'DM Sans',system-ui,sans-serif;
   -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  text-rendering:optimizeLegibility;
   background:var(--bg);
   color:var(--txt);
   transition:background .25s,color .25s;
+}
+body::before{
+  content:'';
+  position:fixed;inset:0;
+  background:radial-gradient(ellipse 80% 60% at 20% -10%,rgba(159,18,57,.12) 0%,transparent 60%),
+             radial-gradient(ellipse 60% 50% at 80% 110%,rgba(159,18,57,.08) 0%,transparent 55%);
+  pointer-events:none;z-index:0;
+}
+body.light::before{
+  background:radial-gradient(ellipse 80% 60% at 20% -10%,rgba(159,18,57,.06) 0%,transparent 60%),
+             radial-gradient(ellipse 60% 50% at 80% 110%,rgba(159,18,57,.04) 0%,transparent 55%);
 }
 
 /* layout */
@@ -63,27 +82,47 @@ body{
   min-height:100dvh;
   display:flex;
   flex-direction:column;
-  gap:10px;
-  padding-top:14px;
-  padding-bottom:16px;
+  gap:12px;
+  padding-top:16px;
+  padding-bottom:20px;
+  position:relative;z-index:1;
 }
 
 /* cards */
-.surf{background:var(--surface);border:1px solid var(--border);border-radius:16px}
-.surf2{background:var(--surface2);border-radius:12px}
+.surf{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:20px;
+  box-shadow:var(--card-shadow);
+  backdrop-filter:blur(var(--glass-blur));
+  -webkit-backdrop-filter:blur(var(--glass-blur));
+}
+.surf2{background:var(--surface2);border-radius:14px}
 .divider{border-top:1px solid var(--divider)}
+
+/* card accent line */
+.surf-accent{position:relative;overflow:hidden}
+.surf-accent::before{
+  content:'';
+  position:absolute;top:0;left:0;right:0;
+  height:1px;
+  background:linear-gradient(90deg,transparent,rgba(159,18,57,.6) 40%,rgba(190,18,60,.8) 50%,rgba(159,18,57,.6) 60%,transparent);
+  border-radius:20px 20px 0 0;
+}
 
 /* theme btn */
 #themeBtn{
-  position:fixed;bottom:18px;right:16px;z-index:999;
-  width:40px;height:40px;border-radius:50%;
+  position:fixed;bottom:20px;right:18px;z-index:999;
+  width:44px;height:44px;border-radius:50%;
   background:var(--surface);border:1px solid var(--border);
   display:flex;align-items:center;justify-content:center;
-  font-size:17px;cursor:pointer;
-  box-shadow:0 2px 12px rgba(0,0,0,.3);
-  transition:transform .18s;
+  font-size:18px;cursor:pointer;
+  box-shadow:0 4px 20px rgba(0,0,0,.4),0 1px 0 rgba(255,255,255,.05) inset;
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+  transition:transform .18s,box-shadow .18s;
 }
-#themeBtn:hover{transform:scale(1.1)}
+#themeBtn:hover{transform:scale(1.1);box-shadow:0 6px 28px rgba(0,0,0,.5)}
 
 /* live dot */
 @keyframes pulse-live{0%,100%{opacity:1}50%{opacity:.3}}
@@ -103,7 +142,7 @@ body{
 .badge-dim{background:var(--surface2);color:var(--txt3)}
 
 /* bar */
-.bar-rose{background:var(--rose)}
+.bar-rose{background:linear-gradient(90deg,var(--rose),var(--rose-hi))}
 .bar-dark{background:var(--surface2)}
 body.light .bar-dark{background:#262626;color:#fff}
 
@@ -132,9 +171,6 @@ body.light .bar-dark{background:#262626;color:#fff}
 /* countdown ring */
 #cdRing circle:first-child{stroke:var(--bar-track)}
 
-/* ctx strong */
-#ctxBox strong{color:var(--rose-hi);font-weight:700}
-body.light #ctxBox strong{color:var(--rose)}
 
 @keyframes celebrate{0%,100%{transform:scale(1)}25%{transform:scale(1.05) rotate(-2.5deg)}50%{transform:scale(1.05) rotate(2.5deg)}75%{transform:scale(1.02)}}
 
@@ -526,61 +562,114 @@ body.light .narrador-inner{
 }
 .update-overlay .alert-bg{
   position:absolute;inset:0;
-  background:radial-gradient(ellipse at center,rgba(159,18,57,.25) 0%,rgba(0,0,0,.7) 100%);
-  animation:alert-bg-in .3s ease forwards;
+  background:rgba(0,0,0,.45);
+  backdrop-filter:blur(4px);
+  -webkit-backdrop-filter:blur(4px);
+  animation:alert-bg-in .25s ease forwards;
 }
 @keyframes alert-bg-in{0%{opacity:0}100%{opacity:1}}
 
 .update-overlay .alert-box{
   position:relative;z-index:1;
-  background:linear-gradient(135deg,#1a1a1a,#0a0a0a);
-  border:2px solid var(--rose);
-  border-radius:20px;
-  padding:28px 36px;
-  text-align:center;
-  box-shadow:0 0 60px var(--rose-glow),0 0 120px rgba(159,18,57,.2);
-  animation:alert-box-in .4s cubic-bezier(.34,1.56,.64,1) forwards;
-  max-width:420px;
-  width:90%;
+  background:rgba(16,16,20,.96);
+  border:1px solid rgba(255,255,255,.1);
+  border-top:1px solid rgba(255,255,255,.15);
+  border-radius:24px;
+  padding:0;
+  overflow:hidden;
+  box-shadow:0 24px 80px rgba(0,0,0,.7),0 0 0 1px rgba(159,18,57,.3),0 0 60px rgba(159,18,57,.15);
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+  animation:alert-box-in .45s cubic-bezier(.34,1.4,.64,1) forwards;
+  max-width:380px;
+  width:calc(100% - 32px);
 }
-@keyframes alert-box-in{0%{opacity:0;transform:scale(.5) rotate(-3deg)}100%{opacity:1;transform:scale(1) rotate(0)}}
-
-.update-overlay .alert-icon{
-  font-size:48px;
-  animation:alert-icon-bounce .6s ease;
-  margin-bottom:8px;
+body.light .update-overlay .alert-box{
+  background:rgba(255,255,255,.97);
+  border-color:rgba(0,0,0,.1);
+  border-top-color:rgba(255,255,255,.9);
 }
-@keyframes alert-icon-bounce{0%{transform:scale(0) rotate(-20deg)}50%{transform:scale(1.3) rotate(5deg)}100%{transform:scale(1) rotate(0)}}
+@keyframes alert-box-in{
+  0%{opacity:0;transform:scale(.8) translateY(12px)}
+  100%{opacity:1;transform:scale(1) translateY(0)}
+}
 
+/* top accent bar (progress drain) */
+.update-overlay .alert-bar{
+  height:3px;width:100%;
+  background:rgba(255,255,255,.06);
+}
+.update-overlay .alert-bar-fill{
+  height:100%;
+  background:linear-gradient(90deg,var(--rose),var(--rose-hi),#e11d48);
+  animation:alert-bar-drain 3.5s linear forwards;
+  box-shadow:0 0 8px var(--rose-glow);
+}
+@keyframes alert-bar-drain{0%{width:100%}100%{width:0%}}
+
+/* body */
+.update-overlay .alert-body{
+  padding:18px 20px 20px;
+}
+
+/* header row */
+.update-overlay .alert-header{
+  display:flex;align-items:center;gap:12px;margin-bottom:14px;
+}
+.update-overlay .alert-icon-wrap{
+  width:44px;height:44px;border-radius:14px;flex-shrink:0;
+  background:linear-gradient(135deg,var(--rose-hi),var(--rose));
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;
+  box-shadow:0 4px 16px var(--rose-glow);
+  animation:alert-icon-pop .5s cubic-bezier(.34,1.56,.64,1) .1s both;
+}
+@keyframes alert-icon-pop{0%{transform:scale(0) rotate(-15deg)}100%{transform:scale(1) rotate(0)}}
+
+.update-overlay .alert-header-text{}
+.update-overlay .alert-badge{
+  font-size:9px;font-weight:700;letter-spacing:1.5px;
+  text-transform:uppercase;color:var(--rose-hi);
+  background:var(--rose-soft);border:1px solid rgba(159,18,57,.25);
+  border-radius:99px;padding:3px 8px;display:inline-block;margin-bottom:3px;
+}
 .update-overlay .alert-title{
   font-family:'Outfit',sans-serif;
-  font-weight:900;font-size:22px;
-  color:#fff;margin-bottom:4px;
-  text-transform:uppercase;letter-spacing:1px;
+  font-weight:900;font-size:17px;
+  color:#f5f5fa;line-height:1.1;
+}
+body.light .update-overlay .alert-title{color:#0a0a14}
+
+/* diff row */
+.update-overlay .alert-diff-row{
+  display:flex;align-items:baseline;gap:8px;margin-bottom:12px;
 }
 .update-overlay .alert-diff{
   font-family:'Outfit',sans-serif;
-  font-weight:900;font-size:38px;
-  color:var(--rose-hi);
-  margin:6px 0;
+  font-weight:900;font-size:42px;
+  color:#f5f5fa;letter-spacing:-0.05em;line-height:1;
 }
-.update-overlay .alert-detail{
-  font-size:14px;color:#a3a3a3;
-  line-height:1.5;
+body.light .update-overlay .alert-diff{color:#0a0a14}
+.update-overlay .alert-diff-lbl{
+  font-size:12px;font-weight:600;color:#a8a8bc;line-height:1.3;
 }
-.update-overlay .alert-detail strong{color:#fbbf24}
 
-.update-overlay .alert-bar{
-  margin-top:14px;height:4px;
-  background:rgba(255,255,255,.1);
-  border-radius:2px;overflow:hidden;
+/* stats row */
+.update-overlay .alert-stats{
+  display:flex;gap:8px;flex-wrap:wrap;
 }
-.update-overlay .alert-bar-fill{
-  height:100%;background:var(--rose);
-  border-radius:2px;
-  animation:alert-bar-drain 3.5s linear forwards;
+.update-overlay .alert-stat{
+  display:flex;align-items:center;gap:5px;
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:99px;padding:5px 11px;
+  font-size:12px;font-weight:600;color:#a8a8bc;
 }
-@keyframes alert-bar-drain{0%{width:100%}100%{width:0%}}
+body.light .update-overlay .alert-stat{
+  background:rgba(0,0,0,.05);border-color:rgba(0,0,0,.08);color:#525265;
+}
+.update-overlay .alert-stat strong{color:#f5f5fa;font-weight:700}
+body.light .update-overlay .alert-stat strong{color:#0a0a14}
 
 /* screen flash on update */
 @keyframes screen-flash{
@@ -605,22 +694,61 @@ body.light .narrador-inner{
   65% {transform:translate(-50%,-50%) scale(1.05) rotate(-2deg);opacity:.9}
   100%{transform:translate(-50%,-50%) scale(.6) rotate(0deg);  opacity:0}
 }
+
+/* ── LOGO ── */
+@keyframes logo-glow{
+  0%,100%{box-shadow:0 6px 24px var(--rose-glow),0 0 0 0 rgba(159,18,57,0),0 1px 0 rgba(255,255,255,.18) inset}
+  50%    {box-shadow:0 8px 36px rgba(159,18,57,.65),0 0 0 5px rgba(159,18,57,.08),0 1px 0 rgba(255,255,255,.18) inset}
+}
+@keyframes logo-dot-pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.5);opacity:.6}}
+.logo-icon{animation:logo-glow 3.5s ease-in-out infinite}
+.logo-dot{animation:logo-dot-pulse 1.4s ease-in-out infinite}
+
+/* splash logo extras */
+@keyframes splash-badge-in{0%{opacity:0;transform:translateY(8px) scale(.9)}100%{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes splash-tag-in{0%{opacity:0;transform:translateX(-6px)}100%{opacity:1;transform:translateX(0)}}
+@keyframes splash-shimmer{
+  0%{background-position:-200% center}100%{background-position:200% center}
+}
 </style>
 </head>
 <body>
 
 <!-- SPLASH -->
-<div id="splash" style="position:fixed;inset:0;z-index:9000;background:#0a0a0a;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .45s,transform .45s">
-  <div style="display:flex;align-items:center;gap:12px;margin-bottom:28px">
-    <div style="width:48px;height:48px;border-radius:14px;background:var(--rose);box-shadow:0 6px 28px var(--rose-glow);display:flex;align-items:center;justify-content:center">
-      <svg style="width:20px;height:20px;fill:white" viewBox="0 0 24 24"><path d="M6 4.75a1 1 0 0 1 1.514-.857l12 7.25a1 1 0 0 1 0 1.714l-12 7.25A1 1 0 0 1 6 19.25V4.75Z"/></svg>
+<div id="splash" style="position:fixed;inset:0;z-index:9000;background:#070709;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .45s,transform .45s;gap:0">
+  <!-- bg glow -->
+  <div style="position:absolute;inset:0;background:radial-gradient(ellipse 70% 55% at 50% 42%,rgba(159,18,57,.2) 0%,transparent 65%);pointer-events:none"></div>
+
+  <!-- icon -->
+  <div style="position:relative;margin-bottom:28px;animation:splash-badge-in .5s cubic-bezier(.34,1.4,.64,1) .1s both">
+    <div style="width:72px;height:72px;border-radius:22px;background:linear-gradient(145deg,#e11d48,#9f1239);box-shadow:0 12px 48px rgba(159,18,57,.6),0 1px 0 rgba(255,255,255,.2) inset;display:flex;align-items:center;justify-content:center">
+      <!-- checkmark / voto -->
+      <svg width="34" height="34" viewBox="0 0 34 34" fill="none">
+        <path d="M7 18 L13.5 24.5 L27 10" stroke="white" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
     </div>
-    <div style="font-family:'Outfit',sans-serif;font-weight:900;font-size:32px;letter-spacing:-0.07em;color:#f5f5f5">VOTO<span style="color:var(--rose);font-style:italic">TV</span></div>
+    <!-- live dot -->
+    <div style="position:absolute;top:-5px;right:-5px;width:16px;height:16px;border-radius:50%;background:#070709;display:flex;align-items:center;justify-content:center">
+      <div style="width:10px;height:10px;border-radius:50%;background:#22c55e;box-shadow:0 0 10px #22c55e;animation:logo-dot-pulse 1.4s ease-in-out infinite"></div>
+    </div>
   </div>
-  <div style="width:160px;height:2px;background:rgba(255,255,255,.07);border-radius:99px;overflow:hidden;margin-bottom:14px">
-    <div style="height:100%;width:0%;background:var(--rose);border-radius:99px;animation:sfill 1.6s cubic-bezier(.4,0,.2,1) forwards;box-shadow:0 0 8px var(--rose-glow)"></div>
+
+  <!-- wordmark -->
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;animation:splash-tag-in .5s ease .25s both">
+    <div style="font-family:'Outfit',sans-serif;font-weight:900;font-size:42px;letter-spacing:-0.06em;line-height:1;color:#f5f5fa">VOTO</div>
+    <div style="background:linear-gradient(135deg,#e11d48,#9f1239);border-radius:10px;padding:5px 11px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(159,18,57,.5);margin-top:2px">
+      <span style="font-family:'Outfit',sans-serif;font-weight:900;font-size:22px;letter-spacing:-.02em;color:white;font-style:italic">TV</span>
+    </div>
   </div>
-  <p style="font-size:10px;font-weight:700;color:#525252;letter-spacing:2px;text-transform:uppercase">Cargando ONPE...</p>
+
+  <!-- tagline -->
+  <div style="font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#6a6a80;margin-bottom:36px;animation:splash-tag-in .5s ease .4s both">🇵🇪 &nbsp;Elecciones 2026 · En vivo</div>
+
+  <!-- progress bar -->
+  <div style="width:160px;height:2px;background:rgba(255,255,255,.06);border-radius:99px;overflow:hidden;margin-bottom:14px">
+    <div style="height:100%;width:0%;background:linear-gradient(90deg,var(--rose),var(--rose-hi));border-radius:99px;animation:sfill 1.6s cubic-bezier(.4,0,.2,1) forwards;box-shadow:0 0 12px var(--rose-glow)"></div>
+  </div>
+  <p style="font-size:10px;font-weight:700;color:#454555;letter-spacing:2px;text-transform:uppercase">Cargando ONPE...</p>
 </div>
 <style>@keyframes sfill{0%{width:0}60%{width:72%}100%{width:100%}}</style>
 
@@ -636,131 +764,136 @@ body.light .narrador-inner{
 <div id="app">
 
   <!-- HEADER -->
-  <header style="display:flex;align-items:center;justify-content:space-between;padding:0 2px">
-    <div style="display:flex;align-items:center;gap:10px">
-      <div style="width:40px;height:40px;border-radius:12px;background:var(--rose);box-shadow:0 4px 16px var(--rose-glow);display:flex;align-items:center;justify-content:center;flex-shrink:0">
-        <svg style="width:18px;height:18px;fill:white" viewBox="0 0 24 24"><path d="M6 4.75a1 1 0 0 1 1.514-.857l12 7.25a1 1 0 0 1 0 1.714l-12 7.25A1 1 0 0 1 6 19.25V4.75Z"/></svg>
+  <header style="display:flex;align-items:center;justify-content:space-between;padding:4px 2px">
+    <div style="display:flex;align-items:center;gap:12px">
+      <!-- icon con live dot -->
+      <div style="position:relative;flex-shrink:0">
+        <div class="logo-icon" style="width:46px;height:46px;border-radius:14px;background:linear-gradient(145deg,#e11d48,#9f1239);display:flex;align-items:center;justify-content:center">
+          <svg width="24" height="24" viewBox="0 0 34 34" fill="none">
+            <path d="M7 18 L13.5 24.5 L27 10" stroke="white" stroke-width="3.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div style="position:absolute;top:-4px;right:-4px;width:13px;height:13px;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center">
+          <div class="logo-dot" style="width:8px;height:8px;border-radius:50%;background:#22c55e;box-shadow:0 0 8px #22c55e"></div>
+        </div>
       </div>
+      <!-- wordmark -->
       <div>
-        <div style="font-family:'Outfit',sans-serif;font-weight:900;font-size:28px;letter-spacing:-0.07em;line-height:1;color:var(--txt)">VOTO<span style="color:var(--rose);font-style:italic">TV</span></div>
-        <div style="font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--txt2);margin-top:2px">Elecciones Perú 2026</div>
+        <div style="display:flex;align-items:center;gap:6px;line-height:1;margin-bottom:3px">
+          <span style="font-family:'Outfit',sans-serif;font-weight:900;font-size:26px;letter-spacing:-0.06em;color:var(--txt)">VOTO</span>
+          <span style="background:linear-gradient(135deg,#e11d48,#9f1239);border-radius:7px;padding:3px 8px;font-family:'Outfit',sans-serif;font-weight:900;font-size:14px;letter-spacing:.01em;color:white;font-style:italic;box-shadow:0 3px 12px rgba(159,18,57,.45)">TV</span>
+        </div>
+        <div style="font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--txt3)">🇵🇪 Elecciones 2026</div>
       </div>
     </div>
     <!-- live pill -->
-    <div style="display:flex;align-items:center;gap:7px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:8px 14px;font-size:11px;font-weight:700;letter-spacing:.5px;color:var(--txt)">
-      <span class="dot-live" style="width:8px;height:8px;border-radius:50%;background:#22c55e;flex-shrink:0;display:inline-block"></span>
+    <div style="display:flex;align-items:center;gap:8px;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);border-radius:99px;padding:9px 16px;font-size:11px;font-weight:700;letter-spacing:.5px;color:var(--txt)">
+      <span class="dot-live" style="width:7px;height:7px;border-radius:50%;background:#22c55e;flex-shrink:0;display:inline-block;box-shadow:0 0 8px #22c55e"></span>
       EN VIVO &nbsp;<span id="liveClock" style="color:#22c55e;font-family:'Outfit',sans-serif;font-size:13px;font-weight:900">--:--</span>
     </div>
   </header>
 
   <!-- ACTAS -->
-  <div id="actasCard" style="padding:0 2px">
-    <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:8px">
+  <div id="actasCard" class="surf surf-accent" style="padding:18px 20px">
+    <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:14px">
       <div>
-        <div style="font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--txt2);margin-bottom:3px">Actas contabilizadas · ONPE</div>
-        <div id="actasPct" style="font-family:'Outfit',sans-serif;font-weight:900;font-size:clamp(42px,10vw,58px);letter-spacing:-0.07em;line-height:1;color:var(--txt)">—<span style="font-size:.45em;color:var(--txt2)">%</span></div>
+        <div style="font-size:10px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--txt3);margin-bottom:4px">Actas contabilizadas · ONPE</div>
+        <div id="actasPct" style="font-family:'Outfit',sans-serif;font-weight:900;font-size:clamp(44px,10vw,60px);letter-spacing:-0.07em;line-height:1;color:var(--txt)">—<span style="font-size:.42em;color:var(--txt3)">%</span></div>
       </div>
       <div style="text-align:right;padding-bottom:4px">
-        <div style="font-size:15px;font-weight:600;color:var(--txt);margin-bottom:3px"><strong id="actasCont">—</strong> / <strong id="actasTotal">—</strong></div>
-        <div style="font-size:14px;color:var(--txt2)"><strong id="actasPend" style="color:var(--rose-hi);font-weight:800">—</strong> pendientes</div>
+        <div style="font-size:14px;font-weight:600;color:var(--txt2);margin-bottom:4px"><strong id="actasCont" style="color:var(--txt);font-weight:800">—</strong> <span style="color:var(--txt3)">/</span> <strong id="actasTotal" style="color:var(--txt);font-weight:800">—</strong></div>
+        <div style="display:inline-flex;align-items:center;gap:5px;background:var(--rose-soft);border:1px solid rgba(159,18,57,.2);border-radius:99px;padding:4px 10px">
+          <span style="width:5px;height:5px;border-radius:50%;background:var(--rose-hi);display:inline-block"></span>
+          <strong id="actasPend" style="color:var(--rose-hi);font-weight:800;font-size:13px">—</strong>
+          <span style="color:var(--txt3);font-size:11px;font-weight:600">pendientes</span>
+        </div>
       </div>
     </div>
-    <div style="height:7px;border-radius:99px;overflow:hidden;background:var(--bar-track)">
+    <div style="height:8px;border-radius:99px;overflow:hidden;background:var(--bar-track);position:relative">
       <div id="progFill" style="height:100%;width:0%;border-radius:99px;transition:width 2s ease"></div>
     </div>
   </div>
 
   <!-- BATTLE -->
-  <div id="battleArena" class="surf" style="position:relative;overflow:visible;padding:0">
-    <div style="position:absolute;top:0;left:0;right:0;height:2px;background:var(--rose);opacity:.8;border-radius:16px 16px 0 0"></div>
+  <div id="battleArena" class="surf surf-accent" style="position:relative;overflow:visible;padding:0">
 
-    <div style="display:grid;grid-template-columns:1fr 40px 1fr;padding:14px 8px 12px">
+    <div style="display:grid;grid-template-columns:1fr 44px 1fr;padding:20px 10px 16px">
 
       <!-- Sánchez -->
-      <div id="fightS" style="display:flex;flex-direction:column;align-items:center;text-align:center;padding:0 6px">
-        <span id="fbadgeS" class="badge-rose" style="font-size:12px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;padding:5px 14px;border-radius:99px;margin-bottom:8px;display:inline-block">2do lugar</span>
-        <div id="ringS" class="floating ring-rose" style="width:clamp(96px,22vw,118px);height:clamp(96px,22vw,118px);border-radius:50%;margin-bottom:8px;transition:all .4s;flex-shrink:0;position:relative;overflow:visible">
+      <div id="fightS" style="display:flex;flex-direction:column;align-items:center;text-align:center;padding:0 4px">
+        <span id="fbadgeS" class="badge-rose" style="font-size:10px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;padding:5px 14px;border-radius:99px;margin-bottom:10px;display:inline-block;box-shadow:0 2px 10px var(--rose-glow)">2do lugar</span>
+        <div id="ringS" class="floating ring-rose" style="width:clamp(96px,22vw,118px);height:clamp(96px,22vw,118px);border-radius:50%;margin-bottom:10px;transition:all .4s;flex-shrink:0;position:relative;overflow:visible">
           <img src="/img/sanchez.jpg" alt="Sánchez" draggable="false" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block">
         </div>
-        <div id="firesS" style="font-size:17px;min-height:22px;margin-bottom:5px;letter-spacing:3px">🔥🔥</div>
-        <div style="font-family:'Outfit',sans-serif;font-weight:900;font-size:clamp(16px,3.8vw,20px);line-height:1.2;color:var(--txt);margin-bottom:3px">Roberto<br>Sánchez</div>
-        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--txt2);margin-bottom:7px">Juntos por el Perú</div>
-        <div id="votosSanchez" style="font-family:'Outfit',sans-serif;font-weight:900;font-size:clamp(20px,5.2vw,28px);line-height:1;color:var(--rose-hi)">—</div>
-        <div id="pctSanchez" style="font-size:15px;font-weight:700;color:var(--txt);margin-top:3px">—</div>
+        <div id="firesS" style="font-size:16px;min-height:22px;margin-bottom:6px;letter-spacing:2px">🔥🔥</div>
+        <div style="font-family:'Outfit',sans-serif;font-weight:900;font-size:clamp(15px,3.6vw,19px);line-height:1.2;color:var(--txt);margin-bottom:4px">Roberto<br>Sánchez</div>
+        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--txt2);margin-bottom:10px;background:var(--surface2);padding:3px 8px;border-radius:6px">Juntos por el Perú</div>
+        <div id="votosSanchez" style="font-family:'Outfit',sans-serif;font-weight:900;font-size:clamp(20px,5vw,27px);line-height:1;color:var(--rose-hi)">—</div>
+        <div id="pctSanchez" style="font-size:14px;font-weight:700;color:var(--txt2);margin-top:4px">—</div>
       </div>
 
       <!-- VS -->
       <div style="display:flex;align-items:center;justify-content:center;padding-top:clamp(46px,12vw,60px)">
-        <div style="width:36px;height:36px;border-radius:50%;background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:'Outfit',sans-serif;font-weight:900;font-size:12px;color:var(--txt2)">VS</div>
+        <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--surface2),var(--surface));border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:'Outfit',sans-serif;font-weight:900;font-size:11px;color:var(--txt3);box-shadow:0 2px 12px rgba(0,0,0,.3)">VS</div>
       </div>
 
       <!-- López -->
-      <div id="fightL" style="display:flex;flex-direction:column;align-items:center;text-align:center;padding:0 6px">
-        <span id="fbadgeL" class="badge-dim" style="font-size:12px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;padding:5px 14px;border-radius:99px;margin-bottom:8px;display:inline-block">3er lugar</span>
-        <div id="ringL" class="ring-dim" style="width:clamp(96px,22vw,118px);height:clamp(96px,22vw,118px);border-radius:50%;margin-bottom:8px;transition:all .4s;flex-shrink:0;position:relative;overflow:visible">
+      <div id="fightL" style="display:flex;flex-direction:column;align-items:center;text-align:center;padding:0 4px">
+        <span id="fbadgeL" class="badge-dim" style="font-size:10px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;padding:5px 14px;border-radius:99px;margin-bottom:10px;display:inline-block">3er lugar</span>
+        <div id="ringL" class="ring-dim" style="width:clamp(96px,22vw,118px);height:clamp(96px,22vw,118px);border-radius:50%;margin-bottom:10px;transition:all .4s;flex-shrink:0;position:relative;overflow:visible">
           <img src="/img/lopezaliaga.jpg" alt="López Aliaga" draggable="false" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block">
         </div>
-        <div id="firesL" style="font-size:17px;min-height:22px;margin-bottom:5px;letter-spacing:3px;opacity:.4">🔥🔥🔥🔥</div>
-        <div style="font-family:'Outfit',sans-serif;font-weight:900;font-size:clamp(16px,3.8vw,20px);line-height:1.2;color:var(--txt);margin-bottom:3px">Rafael<br>López Aliaga</div>
-        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--txt2);margin-bottom:7px">Renovación Popular</div>
-        <div id="votosLopez" style="font-family:'Outfit',sans-serif;font-weight:900;font-size:clamp(20px,5.2vw,28px);line-height:1;color:var(--txt)">—</div>
-        <div id="pctLopez" style="font-size:15px;font-weight:700;color:var(--txt);margin-top:3px">—</div>
+        <div id="firesL" style="font-size:16px;min-height:22px;margin-bottom:6px;letter-spacing:2px;opacity:.4">🔥🔥🔥🔥</div>
+        <div style="font-family:'Outfit',sans-serif;font-weight:900;font-size:clamp(15px,3.6vw,19px);line-height:1.2;color:var(--txt);margin-bottom:4px">Rafael<br>López Aliaga</div>
+        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--txt2);margin-bottom:10px;background:var(--surface2);padding:3px 8px;border-radius:6px">Renovación Popular</div>
+        <div id="votosLopez" style="font-family:'Outfit',sans-serif;font-weight:900;font-size:clamp(20px,5vw,27px);line-height:1;color:var(--txt)">—</div>
+        <div id="pctLopez" style="font-size:14px;font-weight:700;color:var(--txt2);margin-top:4px">—</div>
       </div>
 
     </div>
 
     <!-- Battle bar -->
-    <div style="display:flex;height:clamp(42px,9vw,50px)">
-      <div id="barS" class="bar-rose" style="display:flex;align-items:center;justify-content:center;color:#fff;font-family:'Outfit',sans-serif;font-weight:900;font-size:clamp(14px,3.2vw,17px);min-width:30px;transition:width 2s ease;width:50%">—%</div>
+    <div style="display:flex;height:clamp(44px,9vw,52px);border-radius:0 0 20px 20px;overflow:hidden">
+      <div id="barS" class="bar-rose" style="display:flex;align-items:center;justify-content:center;color:#fff;font-family:'Outfit',sans-serif;font-weight:900;font-size:clamp(14px,3.2vw,17px);min-width:30px;transition:width 2s ease;width:50%;text-shadow:0 1px 4px rgba(0,0,0,.3)">—%</div>
       <div id="barL" class="bar-dark" style="display:flex;align-items:center;justify-content:center;color:#fff;font-family:'Outfit',sans-serif;font-weight:900;font-size:clamp(14px,3.2vw,17px);flex:1">—%</div>
     </div>
   </div>
 
   <!-- DIFF -->
-  <div id="diffCard" class="surf" style="padding:16px 18px">
-    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px">
+  <div id="diffCard" class="surf surf-accent" style="padding:20px 20px">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px">
       <div>
+        <div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--txt3);margin-bottom:4px">Diferencia de votos</div>
         <div id="diffVotos" style="font-family:'Outfit',sans-serif;font-weight:900;font-size:clamp(36px,9vw,52px);letter-spacing:-0.07em;line-height:1;color:var(--txt)">—</div>
-        <p id="diffLbl" style="font-size:15px;font-weight:600;color:var(--txt2);margin-top:4px">votos de ventaja</p>
       </div>
-      <span id="diffTrend" class="trend-eq" style="display:inline-flex;align-items:center;gap:5px;font-size:13px;font-weight:700;padding:6px 12px;border-radius:99px;border:1px solid;flex-shrink:0;margin-top:3px">⏸ sin cambios</span>
+      <span id="diffTrend" class="trend-eq" style="display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:700;padding:7px 13px;border-radius:99px;border:1px solid;flex-shrink:0;margin-top:6px">⏸ sin cambios</span>
     </div>
     <div class="divider" style="padding-top:12px">
-      <div style="display:flex;align-items:flex-start;gap:8px;font-size:14px;color:var(--txt);line-height:1.6;margin-bottom:12px">
-        <span style="flex-shrink:0;font-size:16px">🗳️</span>
-        <span id="ctxBox">Cargando...</span>
-      </div>
-      <div id="pendChips" style="display:flex;border-radius:10px;overflow:hidden;background:var(--surface2);border:1px solid var(--border)"></div>
+      <p id="diffLbl" style="font-size:13px;font-weight:600;color:var(--txt2);margin-bottom:10px">votos de ventaja</p>
+      <div id="pendChips" style="display:flex;border-radius:14px;overflow:hidden;background:var(--surface2);border:1px solid var(--border)"></div>
     </div>
-  </div>
-
-  <!-- RACHA -->
-  <div id="streakBox" class="surf" style="padding:12px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-    <span style="color:var(--txt3);font-size:12px">Esperando datos...</span>
-  </div>
-
-  <!-- PREDICCION -->
-  <div id="predictionBox" class="surf" style="padding:14px 18px">
-    <span style="color:var(--txt3);font-size:12px">Calculando prediccion...</span>
   </div>
 
   <!-- FOOTER -->
-  <div class="surf" style="padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap">
-    <div style="display:flex;align-items:center;gap:8px">
-      <div style="position:relative;width:24px;height:24px;flex-shrink:0">
-        <svg id="cdRing" width="24" height="24" viewBox="0 0 28 28" style="position:absolute;inset:0;transform:rotate(-90deg)">
-          <circle cx="14" cy="14" r="10.5" fill="none" stroke="var(--bar-track)" stroke-width="3"/>
-          <circle id="cdFill" cx="14" cy="14" r="10.5" fill="none" stroke="var(--rose)" stroke-width="3" stroke-linecap="round" stroke-dasharray="65.97" stroke-dashoffset="0" style="transition:stroke-dashoffset 1s linear"/>
-        </svg>
+  <div class="surf" style="padding:14px 18px">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="position:relative;width:28px;height:28px;flex-shrink:0">
+          <svg id="cdRing" width="28" height="28" viewBox="0 0 28 28" style="position:absolute;inset:0;transform:rotate(-90deg)">
+            <circle cx="14" cy="14" r="10.5" fill="none" stroke="var(--bar-track)" stroke-width="3"/>
+            <circle id="cdFill" cx="14" cy="14" r="10.5" fill="none" stroke="var(--rose)" stroke-width="3" stroke-linecap="round" stroke-dasharray="65.97" stroke-dashoffset="0" style="transition:stroke-dashoffset 1s linear"/>
+          </svg>
+        </div>
+        <span id="nextUpdate" style="font-size:13px;font-weight:600;color:var(--txt)">Actualiza en <strong style="color:var(--rose-hi);font-weight:800">1:00</strong></span>
       </div>
-      <span id="nextUpdate" style="font-size:14px;font-weight:600;color:var(--txt)">Actualiza en <strong style="color:var(--rose-hi);font-weight:900">1:00</strong></span>
+      <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--txt2);flex-wrap:wrap">
+        <span id="timestamp">—</span>
+        <span style="color:var(--txt3)">·</span>
+        <span><strong id="onlineCount" style="color:#22c55e;font-size:13px">—</strong> en vivo</span>
+      </div>
     </div>
-    <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--txt2);flex-wrap:wrap">
-      <span id="timestamp">—</span>
-      <span style="color:var(--txt3)">·</span>
-      <span><strong id="onlineCount" style="color:#22c55e;font-size:14px">—</strong> en vivo</span>
-      <span style="color:var(--txt3)">·</span>
-      <span>Fuente: <a href="https://resultadoelectoral.onpe.gob.pe/main/presidenciales" target="_blank" rel="noopener" style="color:var(--rose-hi);font-weight:700;text-decoration:none">ONPE</a></span>
+    <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--divider);text-align:center">
+      <span style="font-size:11px;color:var(--txt3)">Fuente: <a href="https://resultadoelectoral.onpe.gob.pe/main/presidenciales" target="_blank" rel="noopener" style="color:var(--rose-hi);font-weight:700;text-decoration:none">ONPE</a> · Resultados oficiales segunda vuelta Perú 2026</span>
     </div>
   </div>
 
@@ -922,7 +1055,6 @@ function updateUI(data){
       return`<div style="flex:1;text-align:center;padding:8px 4px${i<2?';border-right:1px solid var(--border)':''}"><b style="display:block;font-family:'Outfit',sans-serif;font-weight:900;font-size:clamp(13px,3.2vw,17px);color:var(--txt);line-height:1;margin-bottom:2px">${fmt(v)}</b><small style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--txt3)">${lbl}</small></div>`;
     }).join('');
 
-  document.getElementById('ctxBox').innerHTML=`Solo <strong>${fmt(diff)} votos</strong> separan el 2do del 3er lugar con <strong>${fmt(pend)} actas</strong> por procesar.`;
 
   // Timestamp
   const ts=new Date(data.timestamp);
@@ -970,7 +1102,7 @@ function resetCD(){
   cdTimer=setInterval(()=>{
     countdown=Math.max(0,countdown-1);
     const m=Math.floor(countdown/60),s=String(countdown%60).padStart(2,'0');
-    document.getElementById('nextUpdate').innerHTML=`Actualiza en <strong style="color:var(--txt);font-weight:800">${m}:${s}</strong>`;
+    document.getElementById('nextUpdate').innerHTML=`Actualiza en <strong style="color:var(--rose-hi);font-weight:800">${m}:${s}</strong>`;
     const f=document.getElementById('cdFill');
     f.style.strokeDashoffset=CD_CIRC*(1-countdown/CD_SECS);
   },1000);
@@ -1845,14 +1977,24 @@ function showUpdateAlert(data, prevD){
   overlay.innerHTML = `
     <div class="alert-bg"></div>
     <div class="alert-box">
-      <div class="alert-icon">${icon}</div>
-      <div class="alert-title">${title}</div>
-      <div class="alert-diff">+${fmt(diff)}</div>
-      <div class="alert-detail">
-        ${diffText}<br>
-        <strong>${fmt(pend)} actas</strong> por procesar · ${actas.porcentaje.toFixed(2)}% contabilizado
-      </div>
       <div class="alert-bar"><div class="alert-bar-fill"></div></div>
+      <div class="alert-body">
+        <div class="alert-header">
+          <div class="alert-icon-wrap">${icon.split('').slice(0,1).join('')}</div>
+          <div class="alert-header-text">
+            <div class="alert-badge">EN VIVO · ONPE</div>
+            <div class="alert-title">${title}</div>
+          </div>
+        </div>
+        <div class="alert-diff-row">
+          <div class="alert-diff">+${fmt(diff)}</div>
+          <div class="alert-diff-lbl">votos de<br>ventaja</div>
+        </div>
+        <div class="alert-stats">
+          <div class="alert-stat">🗳️ <strong>${fmt(pend)}</strong> actas pendientes</div>
+          <div class="alert-stat">📊 <strong>${actas.porcentaje.toFixed(2)}%</strong> contabilizado</div>
+        </div>
+      </div>
     </div>
   `;
   document.body.appendChild(overlay);
